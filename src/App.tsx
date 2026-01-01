@@ -1,35 +1,127 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+
+import { useState } from "react";
+import "./App.css";
+
+// ----- TYPE DEFINITIONS -----
+
+interface ClothingItem {
+  id: number;
+  name: string;
+  type: {
+    category: "top" | "bottom" | "shoes" | "accessory";
+    subcategory: string;
+  };
+  style: "sportswear" | "chic" | "classic" | "casual";
+  color: string;
+  isFavorite: boolean;
+  comment?: string;
+}
+
+interface Closet {
+  isOpen: boolean;
+  clothes: ClothingItem[];
+}
 
 function App() {
-  const [count, setCount] = useState(0)
+  // ----- STATE MANAGEMENT
+  const [infoMessage, setInfoMessage] = useState<string | null>(null);
+  const [closet, setCloset] = useState<Closet>({
+    isOpen: false,
+    clothes: [],
+  });
+
+  // ----- FUNCTIONS TO MANAGE CLOSET STATE -----
+  const openCloset = () => {
+    setCloset((prevCloset) => ({ ...prevCloset, isOpen: true }));
+  };
+  const closeCloset = () => {
+    setCloset((prevCloset) => ({ ...prevCloset, isOpen: false }));
+  };
+  const addClothingItem = (item: ClothingItem) => {
+    setCloset((prevCloset) => ({
+      ...prevCloset,
+      clothes: [...prevCloset.clothes, item],
+    }));
+  };
+  const removeClothingItem = (id: number) => {
+    setCloset((prevCloset) => ({
+      ...prevCloset,
+      clothes: prevCloset.clothes.filter((item) => item.id !== id),
+    }));
+  };
+
+  // ----- EVENT HANDLERS -----
+  const handleOpenCloset = () => {
+    openCloset();
+    setInfoMessage("Closet is now open !");
+  };
+
+  const handleCloseCloset = () => {
+    closeCloset();
+    setInfoMessage("Closet is now closed !");
+  };
+
+  const handleAddItem = () => {
+    const newItem: ClothingItem = {
+      id: Date.now(),
+      name: "New T-Shirt",
+      type: { category: "top", subcategory: "t-shirt" },
+      style: "casual",
+      color: "blue",
+      isFavorite: false,
+    };
+    addClothingItem(newItem);
+    setInfoMessage("Added a new clothing item !");
+  };
+
+  const handleRemoveItem = (id: number) => {
+    removeClothingItem(id);
+    setInfoMessage("Removed a clothing item !");
+  };
 
   return (
     <>
+      {/* TITLE */}
+      <h1>Closet Manager</h1>
+      {/* INFO SECTION */}
       <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        <p>{infoMessage ? infoMessage : "Let's manage your closet!"}</p>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
+      {/* CLOSET CONTROLS */}
+      <div>
+        {closet.isOpen ? (
+          <>
+            <button onClick={handleAddItem}>Add Clothing Item</button>
+            <button onClick={handleCloseCloset}>Close Closet</button>
+          </>
+        ) : (
+          <button onClick={handleOpenCloset}>Open Closet</button>
+        )}
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+
+      {/* CLOTHING ITEMS LIST */}
+      {closet.isOpen && (
+        <div>
+          <h2>Clothing Items:</h2>
+          {closet.clothes.length === 0 ? (
+            <p>No clothing items in the closet.</p>
+          ) : (
+            <ul>
+              {closet.clothes.map((item) => (
+                <li key={item.id}>
+                  {item.name} - {item.type.category} ({item.style}, {item.color}
+                  )
+                  <button onClick={() => handleRemoveItem(item.id)}>
+                    Remove
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
     </>
-  )
+  );
 }
 
-export default App
+export default App;
