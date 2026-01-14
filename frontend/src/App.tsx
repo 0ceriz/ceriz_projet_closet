@@ -1,26 +1,13 @@
 
 import { useState } from "react";
 import "./App.css";
+import type { Closet } from "./types/closet.types";
+import Title from "./component/Title";
+import InfoSection from "./component/InfoSection";
+import ClosetControls from "./component/ClosetControls";
+import Modal from "./component/Modal";
 
-// ----- TYPE DEFINITIONS -----
 
-interface ClothingItem {
-  id: number;
-  name: string;
-  type: {
-    category: "top" | "bottom" | "shoes" | "accessory";
-    subcategory: string;
-  };
-  style: "sportswear" | "chic" | "classic" | "casual";
-  color: string;
-  isFavorite: boolean;
-  comment?: string;
-}
-
-interface Closet {
-  isOpen: boolean;
-  clothes: ClothingItem[];
-}
 
 function App() {
   // ----- STATE MANAGEMENT
@@ -30,6 +17,8 @@ function App() {
     clothes: [],
   });
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   // ----- FUNCTIONS TO MANAGE CLOSET STATE -----
   const openCloset = () => {
     setCloset((prevCloset) => ({ ...prevCloset, isOpen: true }));
@@ -37,12 +26,12 @@ function App() {
   const closeCloset = () => {
     setCloset((prevCloset) => ({ ...prevCloset, isOpen: false }));
   };
-  const addClothingItem = (item: ClothingItem) => {
-    setCloset((prevCloset) => ({
-      ...prevCloset,
-      clothes: [...prevCloset.clothes, item],
-    }));
-  };
+   // const addClothingItem = (item: ClothingItem) => {
+  //   setCloset((prevCloset) => ({
+  //     ...prevCloset,
+  //     clothes: [...prevCloset.clothes, item],
+  //   }));
+  // };
   const removeClothingItem = (id: number) => {
     setCloset((prevCloset) => ({
       ...prevCloset,
@@ -60,19 +49,18 @@ function App() {
     closeCloset();
     setInfoMessage("Closet is now closed !");
   };
-
-  const handleAddItem = () => {
-    const newItem: ClothingItem = {
-      id: Date.now(),
-      name: "New T-Shirt",
-      type: { category: "top", subcategory: "t-shirt" },
-      style: "casual",
-      color: "blue",
-      isFavorite: false,
-    };
-    addClothingItem(newItem);
-    setInfoMessage("Added a new clothing item !");
-  };
+  // const handleAddItem = () => {
+  //   const newItem: ClothingItem = {
+  //     id: Date.now(),
+  //     name: "New T-Shirt",
+  //     type: { category: "top", subcategory: "t-shirt" },
+  //     style: "casual",
+  //     color: "blue",
+  //     isFavorite: false,
+  //   };
+  //   addClothingItem(newItem);
+  //   setInfoMessage("Added a new clothing item !");
+  // };
 
   const handleRemoveItem = (id: number) => {
     removeClothingItem(id);
@@ -81,24 +69,13 @@ function App() {
 
   return (
     <>
-      {/* TITLE */}
-      <h1>Closet Manager</h1>
-      {/* INFO SECTION */}
-      <div>
-        <p>{infoMessage ? infoMessage : "Let's manage your closet!"}</p>
-      </div>
-      {/* CLOSET CONTROLS */}
-      <div>
-        {closet.isOpen ? (
-          <>
-            <button onClick={handleAddItem}>Add Clothing Item</button>
-            <button onClick={handleCloseCloset}>Close Closet</button>
-          </>
-        ) : (
-          <button onClick={handleOpenCloset}>Open Closet</button>
-        )}
-      </div>
-
+      <Title/>
+     <InfoSection infoMessage={infoMessage}/>
+    <ClosetControls closetIsOpen={closet.isOpen}
+        onOpen={handleOpenCloset}
+        onClose={handleCloseCloset}
+        onAddItem={() => setIsModalOpen(true)} 
+        />
       {/* CLOTHING ITEMS LIST */}
       {closet.isOpen && (
         <div>
@@ -120,6 +97,14 @@ function App() {
           )}
         </div>
       )}
+
+      <Modal
+        isOpen={isModalOpen}
+        title="Add Clothing Item"
+        onClose={() => setIsModalOpen(false)} 
+      >
+        <p>Here you can add a new clothing item...</p>
+      </Modal>
     </>
   );
 }
