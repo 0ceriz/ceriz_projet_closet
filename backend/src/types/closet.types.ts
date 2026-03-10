@@ -1,6 +1,6 @@
 
 export interface ClothingItem {
-  id: number;
+  id: string;
   name: string;
   type: {
     category: "top" | "bottom" | "shoes" | "accessory";
@@ -16,3 +16,5 @@ export interface Closet {
   isOpen: boolean;
   clothes: ClothingItem[];
 }
+
+export type CreateClothingItemDTO = Omit<ClothingItem, 'id'>;

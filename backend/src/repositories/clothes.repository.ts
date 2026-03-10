@@ -1,8 +1,9 @@
+import { randomUUID } from 'node:crypto';
 import { ClothingItem, CreateClothingItemDTO } from '../types/closet.types';
 
 let clothes: ClothingItem[] = [
   {
-    id: 1,
+    id: '1',
     name: 'Red T-Shirt',
     type: { category: 'top', subcategory: 't-shirt' },
     style: 'casual',
@@ -11,7 +12,7 @@ let clothes: ClothingItem[] = [
     comment: 'My favorite red t-shirt!',
   },
   {
-    id: 2,
+    id: '2',
     name: 'Blue Jeans',
     type: { category: 'bottom', subcategory: 'jeans' },
     style: 'casual',
@@ -19,7 +20,7 @@ let clothes: ClothingItem[] = [
     isFavorite: false,
   },
   {
-    id: 3,
+    id: '3',
     name: 'White Sneakers',
     type: { category: 'shoes', subcategory: 'sneakers' },
     style: 'sportswear',
@@ -38,13 +39,13 @@ const findAll = async (): Promise<ClothingItem[]> => {
 };
 
 const findById = async (id: string): Promise<ClothingItem | null> => {
-  const item = clothes.find((clothing) => clothing.id === Number(id));
+  const item = clothes.find((clothing) => clothing.id === (id));
   return item || null;
 };
 
 const create = async (data: CreateClothingItemDTO): Promise<ClothingItem> => {
   const newItem = {
-    id: Date.now(),
+    id: randomUUID(),
     ...data,
   };
   clothes.push(newItem);
