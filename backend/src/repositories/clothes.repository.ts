@@ -1,3 +1,4 @@
+
 import { randomUUID } from 'node:crypto';
 import { ClothingItem, CreateClothingItemDTO } from '../types/closet.types';
 
@@ -39,7 +40,7 @@ const findAll = async (): Promise<ClothingItem[]> => {
 };
 
 const findById = async (id: string): Promise<ClothingItem | null> => {
-  const item = clothes.find((clothing) => clothing.id === (id));
+  const item = clothes.find((clothing) => clothing.id === id);
   return item || null;
 };
 
