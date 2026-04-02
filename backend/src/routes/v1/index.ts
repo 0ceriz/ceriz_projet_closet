@@ -10,3 +10,4 @@ v1Router.get('/', (_req, res) => {
 v1Router.use('/clothes', clothesRoutes);
 
 export default v1Router;
+

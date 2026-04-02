@@ -1,10 +1,15 @@
 
 import { randomUUID } from 'node:crypto';
-import { ClothingItem, CreateClothingItemDTO } from '../types/closet.types';
+import {
+  ClothingId,
+  ClothingItem,
+  CreateClothingItemDTO,
+  UpdateClothingItemDTO,
+} from '../types/closet.types';
 
 let clothes: ClothingItem[] = [
   {
-    id: '1',
+    id: '11111111-1111-4111-8111-111111111111',
     name: 'Red T-Shirt',
     type: { category: 'top', subcategory: 't-shirt' },
     style: 'casual',
@@ -13,7 +18,7 @@ let clothes: ClothingItem[] = [
     comment: 'My favorite red t-shirt!',
   },
   {
-    id: '2',
+    id: '22222222-2222-4222-8222-222222222222',
     name: 'Blue Jeans',
     type: { category: 'bottom', subcategory: 'jeans' },
     style: 'casual',
@@ -21,7 +26,7 @@ let clothes: ClothingItem[] = [
     isFavorite: false,
   },
   {
-    id: '3',
+    id: '33333333-3333-5333-9333-333333333333',
     name: 'White Sneakers',
     type: { category: 'shoes', subcategory: 'sneakers' },
     style: 'sportswear',
@@ -39,7 +44,7 @@ const findAll = async (): Promise<ClothingItem[]> => {
   });
 };
 
-const findById = async (id: string): Promise<ClothingItem | null> => {
+const findById = async (id: ClothingId): Promise<ClothingItem | null> => {
   const item = clothes.find((clothing) => clothing.id === id);
   return item || null;
 };
@@ -53,8 +58,29 @@ const create = async (data: CreateClothingItemDTO): Promise<ClothingItem> => {
   return newItem;
 };
 
+const updateById = async (
+  id: ClothingId,
+  data: UpdateClothingItemDTO
+): Promise<ClothingItem | null> => {
+  const index = clothes.findIndex((clothing) => clothing.id === id);
+  if (index === -1) return null;
+  const currentItem = clothes[index] as ClothingItem;
+  const updatedItem: ClothingItem = { ...currentItem, ...data };
+  clothes[index] = updatedItem;
+  return updatedItem;
+};
+
+const deleteById = async (id: ClothingId): Promise<boolean> => {
+  const index = clothes.findIndex((clothing) => clothing.id === id);
+  if (index === -1) return false;
+  clothes.splice(index, 1);
+  return true;
+};
+
 export const clothesRepository = {
   findAll,
   findById,
   create,
+  updateById,
+  deleteById,
 };
