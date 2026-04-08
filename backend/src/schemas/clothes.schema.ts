@@ -17,15 +17,16 @@ export const clothingTypeSchema = z.object({
   subcategory: z.string().optional(),
 });
 
-export const createClothingItemSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  type: clothingTypeSchema,
-  style: clothingStyleSchema,
-  color: z.string().optional(),
-  isFavorite: z.boolean().optional().default(false),
-  comment: z.string().optional(),
-})
-.strict();
+export const createClothingItemSchema = z
+  .object({
+    name: z.string().min(1, 'Name is required'),
+    type: clothingTypeSchema,
+    style: clothingStyleSchema,
+    color: z.string().optional(),
+    isFavorite: z.boolean().optional().default(false),
+    comment: z.string().optional(),
+  })
+  .strict();
 
 
 export const updateClothingItemSchema = createClothingItemSchema;

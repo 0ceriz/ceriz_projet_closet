@@ -1,7 +1,6 @@
 
 import { RequestHandler } from 'express';
 import {
-  ClothingId,
   ClothingIdParams,
   ClothingItem,
   CreateClothingItemDTO,
@@ -14,33 +13,22 @@ const getAll: RequestHandler<
   ClothingItem[],
   unknown,
   unknown
-> = async (_req, res, next) => {
-  try {
+> = async (_req, res) => {
     console.log('[GET] /api/v1/clothes');
     const items = await clothesService.getAll();
     res.status(200).json(items);
-  } catch (error) {
-    next(error);
-  }
 };
 
 const getById: RequestHandler<
   ClothingIdParams,
-  ClothingItem | { message: string },
+  ClothingItem,
   unknown,
   unknown
-> = async (req, res, next) => {
-  try {
+> = async (req, res) => {
     const { id } = req.params;
     console.log(`[GET] /api/v1/clothes/${id}`);
     const item = await clothesService.getById(id);
-    // TODO: Handle case where item is not found (service layer)
-    if (item === null)
-      res.status(404).json({ message: 'Clothing item not found' });
-    else res.status(200).json(item);
-  } catch (error) {
-    next(error);
-  }
+    res.status(200).json(item);
 };
 
 const create: RequestHandler<
@@ -48,50 +36,35 @@ const create: RequestHandler<
   ClothingItem,
   CreateClothingItemDTO,
   unknown
-> = async (req, res, next) => {
-  try {
+> = async (req, res) => {
     console.log('[POST] /api/v1/clothes');
     const newItem: CreateClothingItemDTO = req.body;
     const createdItem: ClothingItem = await clothesService.create(newItem);
     res.status(201).json(createdItem);
-  } catch (error) {
-    next(error);
-  }
 };
 
 const updateById: RequestHandler<
   ClothingIdParams,
-  ClothingItem | { message: string },
+  ClothingItem,
   UpdateClothingItemDTO,
   unknown
-> = async (req, res, next) => {
-  try {
+> = async (req, res) => {
     const { id } = req.params;
     console.log(`[PUT] /api/v1/clothes/${id}`);
     const updatedItem = await clothesService.updateById(id, req.body);
-    if (updatedItem === null)
-      res.status(404).json({ message: 'Clothing item not found' });
-    else res.status(200).json(updatedItem);
-  } catch (error) {
-    next(error);
-  }
+    res.status(200).json(updatedItem);
 };
 
 const deleteById: RequestHandler<
   ClothingIdParams,
-  void | { message: string },
+  void,
   unknown,
   unknown
-> = async (req, res, next) => {
-  try {
+> = async (req, res) => {
     const { id } = req.params;
     console.log(`[DELETE] /api/v1/clothes/${id}`);
-    const deleted = await clothesService.deleteById(id);
-    if (!deleted) res.status(404).json({ message: 'Clothing item not found' });
-    else res.status(204).send();
-  } catch (error) {
-    next(error);
-  }
+   await clothesService.deleteById(id);
+   res.status(204).send();
 };
 
 export const clothesController = {

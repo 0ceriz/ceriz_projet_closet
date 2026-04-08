@@ -1,4 +1,4 @@
-
+import { NotFoundError } from '../errors/AppError';
 import { clothesRepository } from '../repositories/clothes.repository';
 import {
   ClothingId,
@@ -12,8 +12,9 @@ const getAll = async (): Promise<ClothingItem[]> => {
   return items;
 };
 
-const getById = async (id: ClothingId): Promise<ClothingItem | null> => {
+const getById = async (id: ClothingId): Promise<ClothingItem> => {
   const item = await clothesRepository.findById(id);
+  if (!item) throw new NotFoundError('Clothing item not found', id);
   return item;
 };
 
@@ -25,14 +26,16 @@ const create = async (data: CreateClothingItemDTO): Promise<ClothingItem> => {
 const updateById = async (
   id: ClothingId,
   data: UpdateClothingItemDTO
-): Promise<ClothingItem | null> => {
+): Promise<ClothingItem> => {
   const item = await clothesRepository.updateById(id, data);
+  if (!item) throw new NotFoundError('Clothing item not found', id);
   return item;
 };
 
-const deleteById = async (id: ClothingId): Promise<boolean> => {
+const deleteById = async (id: ClothingId): Promise<void> => {
   const deleted = await clothesRepository.deleteById(id);
-  return deleted;
+  if (!deleted) throw new NotFoundError('Clothing item not found', id);
+  return void 0;
 };
 
 export const clothesService = {
