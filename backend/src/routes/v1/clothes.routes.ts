@@ -1,4 +1,3 @@
-
 import { Router } from 'express';
 import { clothesController } from '../../controllers/clothes.controller';
 import {

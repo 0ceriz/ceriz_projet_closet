@@ -3,10 +3,10 @@ import { z } from 'zod';
 import { ValidationError } from '../errors/AppError';
 
 export const validateBody = (schema: z.ZodSchema) => {
-  return (req: Request, _res: Response, next: NextFunction) => {
+  return (req: Request, _res: Response, next: NextFunction): void => {
     const result = schema.safeParse(req.body);
     if (!result.success) {
-        return next(
+      return next(
         new ValidationError(
           `Body validation failed: ${result.error.message.toString()}`
         )
@@ -18,10 +18,10 @@ export const validateBody = (schema: z.ZodSchema) => {
 };
 
 export const validateParams = (schema: z.ZodSchema) => {
-  return (req: Request, _res: Response, next: NextFunction) => {
+  return (req: Request, _res: Response, next: NextFunction): void => {
     const result = schema.safeParse(req.params);
     if (!result.success) {
-        return next(
+      return next(
         new ValidationError(
           `Params validation failed: ${result.error.message.toString()}`
         )

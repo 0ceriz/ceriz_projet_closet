@@ -1,4 +1,3 @@
-
 import { z } from 'zod';
 import {
   CLOTHING_CATEGORIES,
@@ -27,7 +26,6 @@ export const createClothingItemSchema = z
     comment: z.string().optional(),
   })
   .strict();
-
 
 export const updateClothingItemSchema = createClothingItemSchema;
 

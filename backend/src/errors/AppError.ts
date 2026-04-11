@@ -1,4 +1,3 @@
-
 export class AppError extends Error {
   public readonly statusCode: number;
   public readonly publicMessage: string;
@@ -23,7 +22,7 @@ export class NotFoundError extends AppError {
     super(
       404,
       'The requested resource was not found',
-      `Resource: ${resource}, ID: ${id || 'N/A'}`
+      `Resource: ${resource}, ID: ${id ?? 'N/A'}`
     );
     Object.setPrototypeOf(this, new.target.prototype);
   }

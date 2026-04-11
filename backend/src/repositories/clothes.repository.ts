@@ -1,4 +1,3 @@
-
 import { randomUUID } from 'node:crypto';
 import {
   ClothingId,
@@ -7,7 +6,7 @@ import {
   UpdateClothingItemDTO,
 } from '../types/closet.types';
 
-let clothes: ClothingItem[] = [
+const clothes: ClothingItem[] = [
   {
     id: '11111111-1111-4111-8111-111111111111',
     name: 'Red T-Shirt',
@@ -46,7 +45,7 @@ const findAll = async (): Promise<ClothingItem[]> => {
 
 const findById = async (id: ClothingId): Promise<ClothingItem | null> => {
   const item = clothes.find((clothing) => clothing.id === id);
-  return item || null;
+  return item ?? null;
 };
 
 const create = async (data: CreateClothingItemDTO): Promise<ClothingItem> => {
@@ -64,7 +63,7 @@ const updateById = async (
 ): Promise<ClothingItem | null> => {
   const index = clothes.findIndex((clothing) => clothing.id === id);
   if (index === -1) return null;
-  const currentItem = clothes[index] as ClothingItem;
+  const currentItem = clothes[index]!;
   const updatedItem: ClothingItem = { ...currentItem, ...data };
   clothes[index] = updatedItem;
   return updatedItem;
