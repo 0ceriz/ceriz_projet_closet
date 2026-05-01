@@ -1,0 +1,35 @@
+services:
+  db:
+    image: postgres:17
+    container_name: crz_project_db
+    restart: unless-stopped
+
+    env_file:
+      - .env
+
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+
+    ports:
+      # # Expose PostgreSQL on the host machine
+      - "${POSTGRES_PORT}:5432"
+
+    volumes:
+      # Persist PostgreSQL data in a Docker volume
+      - crz_db_data:/var/lib/postgresql/data
+      # Initialize the database schema and seed data on first startup
+      - ./backend/db/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+      - ./backend/db/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql:ro
+
+    healthcheck:
+      # Check whether PostgreSQL is ready to accept connections
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  crz_db_data:
