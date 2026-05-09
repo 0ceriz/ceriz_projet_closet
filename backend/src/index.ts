@@ -2,8 +2,10 @@ import express from 'express';
 import cookieParser from 'cookie-parser';
 import v1Router from './routes/v1';
 import errorHandler from './middlewares/errorHandler';
+import { env } from './config/env';
+
 const app = express();
-const PORT = 3000;
+const { PORT } = env;
 
 app.use(cookieParser());
 app.use(express.json());
