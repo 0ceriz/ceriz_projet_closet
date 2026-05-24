@@ -53,3 +53,4 @@ CLOTHING_PICTURE: id, url, alt_text, is_cover, created_at, updated_at
 :
 :
 OUTFIT_PICTURE: id, url, alt_text, is_cover, created_at, updated_at
+
