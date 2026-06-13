@@ -32,3 +32,11 @@ export interface AppUserPublic {
   createdAt: Date;
   updatedAt: Date | null;
 }
+
+// CreateAppUserRepositoryData
+export interface CreateAppUserRepositoryData {
+  pseudo: string;
+  email: string;
+  passwordHash: string;
+  pictureUrl?: string | null;
+}

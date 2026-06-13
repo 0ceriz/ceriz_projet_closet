@@ -18,23 +18,27 @@ const getAll: RequestHandler<
   res.status(200).json(users);
 };
 
-const getById: RequestHandler<AppUserIdParams, string, unknown, unknown> = (
-  req,
-  res
-) => {
+const getById: RequestHandler<
+  AppUserIdParams,
+  AppUserPublic,
+  unknown,
+  unknown
+> = async (req, res) => {
   const { id } = req.params;
   console.log(`[GET] /api/v1/users/${id}`);
-  res.send(`Get app user by ID: ${id}`);
+  const user = await appUserService.getById(id);
+  res.status(200).json(user);
 };
 
-const create: RequestHandler<unknown, string, CreateAppUserDTO, unknown> = (
-  req,
-  res
-) => {
+const create: RequestHandler<
+  unknown,
+  AppUserPublic,
+  CreateAppUserDTO,
+  unknown
+> = async (req, res) => {
   console.log('[POST] /api/v1/users');
-  const newUser: CreateAppUserDTO = req.body;
-  console.log('New user data:', newUser);
-  res.send('Create a new app user');
+  const createdUser = await appUserService.create(req.body);
+  res.status(201).json(createdUser);
 };
 
 const updateById: RequestHandler<
@@ -50,13 +54,16 @@ const updateById: RequestHandler<
   res.send(`Update app user with ID: ${id}`);
 };
 
-const deleteById: RequestHandler<AppUserIdParams, string, unknown, unknown> = (
-  req,
-  res
-) => {
+const deleteById: RequestHandler<
+  AppUserIdParams,
+  AppUserPublic,
+  unknown,
+  unknown
+> = async (req, res) => {
   const { id } = req.params;
   console.log(`[DELETE] /api/v1/users/${id}`);
-  res.send(`Delete app user with ID: ${id}`);
+  await appUserService.deleteById(id);
+  res.status(204).end();
 };
 
 export const appUserController = {
