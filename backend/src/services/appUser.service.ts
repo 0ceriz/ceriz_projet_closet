@@ -1,4 +1,5 @@
 import { ConflictError, NotFoundError } from '../errors/AppError';
+import bcrypt from 'bcrypt';
 import { appUserRepository } from '../repositories/appUser.repository';
 import {
   AppUserDb,
@@ -43,7 +44,7 @@ const create = async (data: CreateAppUserDTO): Promise<AppUserPublic> => {
     throw new ConflictError(`Pseudo already used: ${data.pseudo}`);
 
   // TODO: Hash the password
-  const passwordHash = data.password;
+  const passwordHash = await bcrypt.hash(data.password, 10);
 
   // Create the user
   const createdUser = await appUserRepository.create({

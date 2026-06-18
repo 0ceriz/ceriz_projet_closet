@@ -5,7 +5,7 @@ import {
   ClothingItem,
   CreateClothingItemDTO,
   UpdateClothingItemDTO,
-} from '../types/closet.types';
+} from '../types/clothing.types';
 
 const getAll = async (): Promise<ClothingItem[]> => {
   const items = await clothesRepository.findAll();

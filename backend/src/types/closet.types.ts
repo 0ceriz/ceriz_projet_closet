@@ -1,38 +1,30 @@
 import { z } from 'zod';
 import {
-  clothingIdParamSchema,
-  createClothingItemSchema,
-  updateClothingItemSchema,
-} from '../schemas/clothes.schema';
+  closetIdParamSchema,
+  createClosetSchema,
+  updateClosetSchema,
+} from '../schemas/closet.schema';
+import { AppUserId } from './appUser.types';
 
-// export interface ClothingType {
-//   category: (typeof CLOTHING_CATEGORIES)[number];
-//   subcategory: string;
-// }
+export type ClosetIdParams = z.infer<typeof closetIdParamSchema>;
+export type ClosetId = ClosetIdParams['id'];
 
-// export interface ClothingItem {
-//   id: string;
-//   name: string;
-//   type: ClothingType;
-//   style: (typeof CLOTHING_STYLES)[number];
-//   color: string;
-//   isFavorite: boolean;
-//   comment?: string;
-// }
-
-// export type CreateClothingItemDTO = Omit<ClothingItem, 'id'>;
-
-export type ClothingIdParams = z.infer<typeof clothingIdParamSchema>;
-export type ClothingId = ClothingIdParams['id'];
-
-export type CreateClothingItemDTO = z.infer<typeof createClothingItemSchema>;
-export type UpdateClothingItemDTO = z.infer<typeof updateClothingItemSchema>;
-
-export type ClothingItem = CreateClothingItemDTO & {
-  id: ClothingId;
-};
+// CreateClosetDTO and UpdateClosetDTO represent the expected shape of the data when creating or updating a closet, respectively.
+export type CreateClosetDTO = z.infer<typeof createClosetSchema>;
+export type UpdateClosetDTO = z.infer<typeof updateClosetSchema>;
 
 export interface Closet {
-  isOpen: boolean;
-  clothes: ClothingItem[];
+  id: ClosetId;
+  name: string;
+  description?: string;
+  user_id: AppUserId;
+  created_at: Date;
+  updated_at: Date | null;
+}
+
+// CreateClosetRepositoryData
+export interface CreateClosetRepositoryData {
+  user_id: AppUserId;
+  name: string;
+  description?: string;
 }
