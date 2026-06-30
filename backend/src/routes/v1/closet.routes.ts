@@ -10,7 +10,9 @@ import {
 
 const closetRoutes = Router();
 
-closetRoutes.get('/me', authMiddleware, closetController.getMyClosets);
+closetRoutes.use(authMiddleware);
+
+closetRoutes.get('/me', closetController.getMyClosets);
 
 closetRoutes.get('/', closetController.getAll);
 
@@ -18,6 +20,12 @@ closetRoutes.get(
   '/:id',
   validateParams(closetIdParamSchema),
   closetController.getById
+);
+
+closetRoutes.post(
+  '/',
+  validateBody(createClosetSchema),
+  closetController.create
 );
 
 closetRoutes.patch(
@@ -31,13 +39,6 @@ closetRoutes.delete(
   '/:id',
   validateParams(closetIdParamSchema),
   closetController.deleteById
-);
-
-closetRoutes.post(
-  '/',
-  authMiddleware,
-  validateBody(createClosetSchema),
-  closetController.create
 );
 
 export default closetRoutes;

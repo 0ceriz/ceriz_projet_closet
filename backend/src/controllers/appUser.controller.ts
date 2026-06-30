@@ -6,6 +6,7 @@ import {
   UpdateAppUserDTO,
 } from '../types/appUser.types';
 import { appUserService } from '../services/appUser.service';
+import { UnauthorizedError } from '../errors/AppError';
 
 const getAll: RequestHandler<
   unknown,
@@ -43,15 +44,25 @@ const create: RequestHandler<
 
 const updateById: RequestHandler<
   AppUserIdParams,
-  string,
+  AppUserPublic,
   UpdateAppUserDTO,
   unknown
-> = (req, res) => {
+> = async (req, res) => {
   const { id } = req.params;
+
   console.log(`[PATCH] /api/v1/users/${id}`);
-  const updatedUser: UpdateAppUserDTO = req.body;
-  console.log('Updated user data:', updatedUser);
-  res.send(`Update app user with ID: ${id}`);
+
+  if (!req.user) {
+    throw new UnauthorizedError('User not authenticated');
+  }
+
+  const updatedUser = await appUserService.updateById(
+    id,
+    req.body,
+    req.user.id
+  );
+
+  res.status(200).json(updatedUser);
 };
 
 const deleteById: RequestHandler<
@@ -62,7 +73,11 @@ const deleteById: RequestHandler<
 > = async (req, res) => {
   const { id } = req.params;
   console.log(`[DELETE] /api/v1/users/${id}`);
-  await appUserService.deleteById(id);
+
+  if (!req.user) {
+    throw new UnauthorizedError('User not authenticated');
+  }
+  await appUserService.deleteById(id, req.user.id);
   res.status(204).end();
 };
 

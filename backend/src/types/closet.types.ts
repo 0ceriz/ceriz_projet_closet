@@ -14,17 +14,23 @@ export type CreateClosetDTO = z.infer<typeof createClosetSchema>;
 export type UpdateClosetDTO = z.infer<typeof updateClosetSchema>;
 
 export interface Closet {
-  id: ClosetId;
+  id: string;
+  userId: string;
   name: string;
   description?: string;
-  user_id: AppUserId;
-  created_at: Date;
-  updated_at: Date | null;
+  createdAt: Date;
+  updatedAt: Date | null;
 }
 
 // CreateClosetRepositoryData
 export interface CreateClosetRepositoryData {
   user_id: AppUserId;
   name: string;
+  description?: string;
+}
+
+// Data sent to the repository when updating a closet
+export interface UpdateClosetRepositoryData {
+  name?: string;
   description?: string;
 }

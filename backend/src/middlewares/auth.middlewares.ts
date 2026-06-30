@@ -1,50 +1,51 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import { UnauthorizedError } from '../errors/AppError';
+import { revokedTokenRepository } from '../repositories/revokedToken.repository';
 
-export const authMiddleware = (
+interface JwtPayload {
+  userId: string;
+  email: string;
+}
+
+export const authMiddleware = async (
   req: Request,
-  res: Response,
+  _res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
+  const { token } = req.cookies ?? {};
+
+  if (!token) {
+    throw new UnauthorizedError('Missing token');
+  }
+
+  if (typeof token !== 'string') {
+    throw new UnauthorizedError('Missing token');
+  }
+
+  // Vérifie que le token n'a pas été révoqué
+  const revoked = await revokedTokenRepository.findByToken(token);
+
+  if (revoked) {
+    throw new UnauthorizedError('Token has been revoked');
+  }
+
+  const secret = process.env.JWT_SECRET;
+
+  if (!secret) {
+    throw new Error('JWT_SECRET is not defined');
+  }
+
   try {
-    console.log('🔥 AUTH MIDDLEWARE CALLED');
-
-    const header = req.headers.authorization;
-    console.log('📌 AUTH HEADER:', header);
-
-    if (!header) {
-      console.log('❌ Missing Authorization header');
-      return res.status(401).json({ message: 'Missing Authorization header' });
-    }
-
-    const parts = header.split(' ');
-    console.log('📌 HEADER PARTS:', parts);
-
-    if (parts.length !== 2) {
-      console.log('❌ Invalid Authorization format');
-      return res.status(401).json({ message: 'Invalid Authorization format' });
-    }
-
-    const token = parts[1];
-    console.log('📌 TOKEN:', token);
-
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!);
-    console.log('📌 DECODED TOKEN:', decoded);
+    const decoded = jwt.verify(token, secret) as JwtPayload;
 
     req.user = {
-      // supporte les 2 formats possibles (safe)
-      id: (decoded as any).userId || (decoded as any).id,
-      email: (decoded as any).email,
+      id: decoded.userId,
+      email: decoded.email,
     };
 
-    console.log('✅ USER SET ON REQUEST:', req.user);
-
-    return next();
-  } catch (error) {
-    console.log('💥 JWT ERROR:', error);
-
-    return res.status(401).json({
-      message: 'Invalid or expired token',
-    });
+    next();
+  } catch {
+    throw new UnauthorizedError('Invalid or expired token');
   }
 };

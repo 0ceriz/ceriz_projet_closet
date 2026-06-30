@@ -6,6 +6,7 @@ import {
   UpdateClosetDTO,
 } from '../types/closet.types';
 import { closetService } from '../services/closet.service';
+import { UnauthorizedError } from '../errors/AppError';
 
 const getAll: RequestHandler<unknown, Closet[], unknown, unknown> = async (
   _req,
@@ -36,27 +37,36 @@ const create: RequestHandler<
 > = async (req, res) => {
   console.log('[POST] /api/v1/closets');
 
-  console.log('Authenticated user:', req.user);
+  if (!req.user) {
+    throw new UnauthorizedError('User not authenticated');
+  }
 
-  const createdCloset = await closetService.create({
-    ...req.body,
-    user_id: req.user.id,
-  });
+  const createdCloset = await closetService.create(req.body, req.user.id);
 
   res.status(201).json(createdCloset);
 };
 
 const updateById: RequestHandler<
   ClosetIdParams,
-  string,
+  Closet,
   UpdateClosetDTO,
   unknown
-> = (req, res) => {
+> = async (req, res) => {
   const { id } = req.params;
+
   console.log(`[PATCH] /api/v1/closets/${id}`);
-  const updatedCloset: UpdateClosetDTO = req.body;
-  console.log('Updated closet data:', updatedCloset);
-  res.send(`Update closet with ID: ${id}`);
+
+  if (!req.user) {
+    throw new UnauthorizedError('User not authenticated');
+  }
+
+  const updatedCloset = await closetService.updateById(
+    id,
+    req.body,
+    req.user.id
+  );
+
+  res.status(200).json(updatedCloset);
 };
 
 const deleteById: RequestHandler<
@@ -67,7 +77,12 @@ const deleteById: RequestHandler<
 > = async (req, res) => {
   const { id } = req.params;
   console.log(`[DELETE] /api/v1/closets/${id}`);
-  await closetService.deleteById(id);
+  if (!req.user) {
+    throw new UnauthorizedError('User not authenticated');
+  }
+
+  await closetService.deleteById(id, req.user.id);
+
   res.status(204).end();
 };
 
@@ -75,7 +90,7 @@ const getMyClosets: RequestHandler = async (req, res) => {
   console.log('[GET] /closets/me');
 
   if (!req.user) {
-    return res.status(401).json({ message: 'Unauthorized' });
+    throw new UnauthorizedError('User not authenticated');
   }
 
   const closets = await closetService.getByUserId(req.user.id);

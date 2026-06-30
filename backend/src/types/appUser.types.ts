@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import {
   appUserIdParamSchema,
-  createAppUserSchema,
+  registerSchema,
   updateAppUserSchema,
 } from '../schemas/appUser.schema';
 
@@ -9,8 +9,11 @@ export type AppUserIdParams = z.infer<typeof appUserIdParamSchema>;
 export type AppUserId = AppUserIdParams['id'];
 
 // CreateAppUserDTO and UpdateAppUserDTO represent the expected shape of the data when creating or updating an app user, respectively.
-export type CreateAppUserDTO = z.infer<typeof createAppUserSchema>;
+export type CreateAppUserDTO = z.infer<typeof registerSchema>;
 export type UpdateAppUserDTO = z.infer<typeof updateAppUserSchema>;
+
+// UpdateAppUserRepositoryData represents the shape of the data when updating an app user in the repository. It allows for partial updates, meaning that not all fields are required.
+export type UpdateAppUserRepositoryData = Partial<CreateAppUserRepositoryData>;
 
 // AppUserDb represents the shape of the app user data stored in the database.
 export interface AppUserDb {

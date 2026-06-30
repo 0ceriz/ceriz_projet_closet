@@ -4,21 +4,25 @@ import { authMiddleware } from '../../middlewares/auth.middlewares';
 
 import { authController } from '../../controllers/auth.controller';
 import { loginSchema } from '../../schemas/auth.schema';
-import { createAppUserSchema } from '../../schemas/appUser.schema';
+import { registerSchema } from '../../schemas/appUser.schema';
 
 const authRoutes = Router();
+
+//Public routes
 
 // POST /api/v1/auth/register
 authRoutes.post(
   '/register',
-  validateBody(createAppUserSchema),
+  validateBody(registerSchema),
   authController.register
 );
 
 // POST /api/v1/auth/login
 authRoutes.post('/login', validateBody(loginSchema), authController.login);
 
-// GET /api/v1/auth/me
+// Protected routes
+authRoutes.post('/logout', authMiddleware, authController.logout);
+
 authRoutes.get('/me', authMiddleware, authController.me);
 
 export default authRoutes;

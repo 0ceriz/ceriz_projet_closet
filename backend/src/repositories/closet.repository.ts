@@ -3,6 +3,7 @@ import {
   Closet,
   ClosetId,
   CreateClosetRepositoryData,
+  UpdateClosetRepositoryData,
 } from '../types/closet.types';
 
 const findAll = async (): Promise<Closet[]> => {
@@ -39,7 +40,10 @@ const findById = async (id: ClosetId): Promise<Closet | null> => {
   return result.rows[0] ?? null;
 };
 
-const findByName = async (name: string): Promise<Closet | null> => {
+const findByNameAndUserId = async (
+  name: string,
+  userId: string
+): Promise<Closet | null> => {
   const query = `
     SELECT
       id,
@@ -52,7 +56,7 @@ const findByName = async (name: string): Promise<Closet | null> => {
     WHERE name = $1;
   `;
 
-  const result = await pool.query<Closet>(query, [name]);
+  const result = await pool.query<Closet>(query, [name, userId]);
   return result.rows[0] ?? null;
 };
 
@@ -109,11 +113,40 @@ const findByUserId = async (userId: string): Promise<Closet[]> => {
   return result.rows;
 };
 
+const updateById = async (
+  id: ClosetId,
+  data: UpdateClosetRepositoryData
+): Promise<Closet | null> => {
+  //COALESCE permet de garder la valeur actuelle si la nouvelle valeur est null
+  const query = `
+    UPDATE closet
+    SET
+      name = COALESCE($2, name), 
+      description = COALESCE($3, description),
+      updated_at = NOW()
+    WHERE id = $1
+    RETURNING
+      id,
+      user_id,
+      name,
+      description,
+      created_at,
+      updated_at;
+  `;
+
+  const values = [id, data.name ?? null, data.description ?? null];
+
+  const result = await pool.query<Closet>(query, values);
+
+  return result.rows[0] ?? null;
+};
+
 export const closetRepository = {
   findAll,
   findById,
-  findByName,
+  findByNameAndUserId,
   create,
   deleteById,
   findByUserId,
+  updateById,
 };

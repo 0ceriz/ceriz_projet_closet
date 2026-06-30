@@ -153,6 +153,13 @@ CREATE TABLE outfit_tag (
         FOREIGN KEY (tag_id) REFERENCES tag (id) ON DELETE CASCADE
 );
 
+CREATE TABLE revoked_token (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    token TEXT NOT NULL UNIQUE,
+    expires_at TIMESTAMP NOT NULL,
+    revoked_at TIMESTAMP DEFAULT NOW()
+);
+
 CREATE INDEX idx_closet_user_id ON closet (user_id);
 CREATE INDEX idx_clothing_item_closet_id ON clothing_item (closet_id);
 CREATE INDEX idx_clothing_item_category_id ON clothing_item (category_id);
