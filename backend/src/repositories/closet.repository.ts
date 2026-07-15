@@ -53,10 +53,12 @@ const findByNameAndUserId = async (
       created_at,
       updated_at
     FROM closet
-    WHERE name = $1;
+    WHERE name = $1
+      AND user_id = $2;
   `;
 
   const result = await pool.query<Closet>(query, [name, userId]);
+
   return result.rows[0] ?? null;
 };
 

@@ -15,3 +15,20 @@ export interface Closet {
   isOpen: boolean;
   clothes: ClothingItem[];
 }
+
+export interface Closet {
+
+  id: string;
+
+  name: string;
+
+  description?: string;
+
+  user_id: string;
+
+  created_at: string;
+
+  updated_at?: string | null;
+
+
+}
