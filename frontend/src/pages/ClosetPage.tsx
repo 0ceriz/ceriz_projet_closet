@@ -12,23 +12,14 @@ import ClosetDetail from "../component/ClosetDetail";
 
 
 export default function ClosetPage() {
-
-
   const [closets, setClosets] =
     useState<Closet[]>([]);
-
-
   const [loadingClosets, setLoadingClosets] =
     useState(true);
-
-
   const [selectedCloset, setSelectedCloset] =
     useState<Closet | null>(null);
 
-
-
   const loadClosets = async () => {
-
     try {
 
       const data =
@@ -36,14 +27,12 @@ export default function ClosetPage() {
 
       setClosets(data);
 
-
     } catch(error) {
 
       console.error(
         "Erreur chargement closets",
         error
       );
-
 
     } finally {
 
@@ -53,23 +42,15 @@ export default function ClosetPage() {
 
   };
 
-
-
   useEffect(() => {
 
     void loadClosets();
 
   }, []);
 
-
-
-
   return (
     <>
-
       <Title />
-
-
       <CreateClosetForm
 
         onCreated={() => {
@@ -77,15 +58,9 @@ export default function ClosetPage() {
         }}
 
       />
-
-
-
       <h2>
         My closets
       </h2>
-
-
-
       {
         loadingClosets ? (
 
@@ -93,18 +68,14 @@ export default function ClosetPage() {
             Loading closets...
           </p>
 
-
         ) : closets.length === 0 ? (
 
           <p>
             No closet yet
           </p>
 
-
         ) : (
-
           <div>
-
             {
               closets.map((closet) => (
 
@@ -126,9 +97,6 @@ export default function ClosetPage() {
         )
       }
 
-
-
-
 {
   selectedCloset && (
 
@@ -138,8 +106,6 @@ export default function ClosetPage() {
 
   )
 }
-
-
     </>
   );
 }

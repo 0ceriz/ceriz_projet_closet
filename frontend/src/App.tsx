@@ -1,8 +1,6 @@
 import { useAuth } from "./hooks/useAuth";
-
 import LoginPage from "./pages/LoginPage";
 import ClosetPage from "./pages/ClosetPage";
-
 
 function App() {
 
@@ -11,16 +9,13 @@ function App() {
     loading,
   } = useAuth();
 
-
   if (loading) {
     return <p>Loading...</p>;
   }
 
-
   if (!user) {
     return <LoginPage />;
   }
-
 
   return <ClosetPage />;
 

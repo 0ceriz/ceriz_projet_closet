@@ -24,6 +24,7 @@
     "dotenv": "^17.4.2",
     "eslint-plugin-prettier": "^5.5.5",
     "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
     "node-cron": "^4.5.0",
     "pg": "^8.20.0",
     "pg-pool": "^3.13.0",

@@ -8,6 +8,9 @@ import { AppUserPublic, CreateAppUserDTO } from '../types/appUser.types';
 import { LoginDTO } from '../types/auth.types';
 import { mapAppUserDbToPublic } from '../mappers/appUser.mapper';
 import { revokedTokenRepository } from '../repositories/revokedToken.repository';
+import { hashPassword } from '../utils/hash';
+import { generateAccessToken } from '../utils/token';
+import { env } from '../config/env';
 
 const register = async (data: CreateAppUserDTO): Promise<AppUserPublic> => {
   const existingUserByEmail = await appUserRepository.findByEmail(data.email);
@@ -24,12 +27,12 @@ const register = async (data: CreateAppUserDTO): Promise<AppUserPublic> => {
     throw new ConflictError(`Pseudo already used: ${data.pseudo}`);
   }
 
-  const passwordHash = await bcrypt.hash(data.password, 10);
+  const passwordHash = await hashPassword(data.password);
   try {
     const createdUser = await appUserRepository.create({
       pseudo: data.pseudo,
       email: data.email,
-      passwordHash: passwordHash,
+      passwordHash,
       pictureUrl: data.pictureUrl ?? null,
     });
 
@@ -63,24 +66,21 @@ const login = async (data: LoginDTO): Promise<string> => {
   if (!isMatch) {
     throw new ConflictError('Invalid credentials');
   }
-
-  const token = jwt.sign(
-    { userId: user.id, email: user.email },
-    process.env.JWT_SECRET!,
-    { expiresIn: '1h' }
-  );
+  const token = generateAccessToken({
+    userId: user.id,
+    email: user.email,
+  });
 
   return token;
 };
 
 const logout = async (token: string): Promise<void> => {
-  const secret = process.env.JWT_SECRET;
+  const decoded = jwt.verify(
+    token,
+    env.JWT_ACCESS_TOKEN_SECRET
+  ) as jwt.JwtPayload;
 
-  if (!secret) {
-    throw new Error('JWT_SECRET is not defined');
-  }
-
-  const decoded = jwt.verify(token, secret) as jwt.JwtPayload;
+  console.log('Decoded token:', decoded);
 
   if (typeof decoded.exp !== 'number') {
     throw new Error('Token does not contain an expiration date');

@@ -30,5 +30,4 @@ export interface Closet {
 
   updated_at?: string | null;
 
-
 }

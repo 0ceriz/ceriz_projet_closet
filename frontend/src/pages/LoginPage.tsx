@@ -3,18 +3,11 @@ import { useAuth } from "../hooks/useAuth";
 
 
 export default function LoginPage() {
-
   const { login } = useAuth();
-
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const [error, setError] = useState<string | null>(null);
-
   const [loading, setLoading] = useState(false);
-
-
 
   const handleSubmit = async (
     e: React.FormEvent
@@ -24,7 +17,6 @@ export default function LoginPage() {
 
     setError(null);
     setLoading(true);
-
 
     try {
 
@@ -47,20 +39,15 @@ export default function LoginPage() {
 
   };
 
-
   return (
     <div>
-
       <h1>
         Login
       </h1>
 
-
       <form onSubmit={handleSubmit}>
 
-
         <div>
-
           <label>
             Email
           </label>
@@ -73,13 +60,9 @@ export default function LoginPage() {
             }
             required
           />
-
         </div>
 
-
-
         <div>
-
           <label>
             Password
           </label>
@@ -92,10 +75,7 @@ export default function LoginPage() {
             }
             required
           />
-
         </div>
-
-
 
         {error && (
           <p>
@@ -103,24 +83,17 @@ export default function LoginPage() {
           </p>
         )}
 
-
-
         <button
           type="submit"
           disabled={loading}
         >
-
           {loading
             ? "Connexion..."
             : "Login"
           }
 
         </button>
-
-
       </form>
-
-
     </div>
   );
 }

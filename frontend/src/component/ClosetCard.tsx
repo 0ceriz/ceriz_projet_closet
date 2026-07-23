@@ -12,9 +12,7 @@ export default function ClosetCard({
   onClick,
 }: Props) {
 
-
   return (
-
     <div
       onClick={() => onClick(closet)}
       style={{
@@ -24,23 +22,17 @@ export default function ClosetCard({
         cursor: "pointer",
       }}
     >
-
       <h3>
         {closet.name}
       </h3>
-
-
       {
         closet.description && (
-
           <p>
             {closet.description}
           </p>
 
         )
       }
-
-
     </div>
 
   );

@@ -9,8 +9,6 @@ interface Props {
 export default function ClosetDetail({
   closet,
 }: Props) {
-
-
   return (
     <div>
 
@@ -18,12 +16,9 @@ export default function ClosetDetail({
         Selected closet
       </h2>
 
-
       <h3>
         {closet.name}
       </h3>
-
-
       {
         closet.description && (
 
@@ -33,8 +28,6 @@ export default function ClosetDetail({
 
         )
       }
-
-
     </div>
   );
 }

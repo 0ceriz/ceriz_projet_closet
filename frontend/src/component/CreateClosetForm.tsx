@@ -36,13 +36,11 @@ export default function CreateClosetForm({
         description,
       });
 
-
       setName("");
       setDescription("");
       setError(null);
 
       onCreated();
-
 
     } catch(error) {
 
@@ -60,16 +58,13 @@ export default function CreateClosetForm({
   return (
     <form onSubmit={handleSubmit}>
 
-
       <h3>
         Create a closet
       </h3>
 
-
       {error && (
         <p>{error}</p>
       )}
-
 
       <input
         type="text"
@@ -80,7 +75,6 @@ export default function CreateClosetForm({
         }
       />
 
-
       <input
         type="text"
         placeholder="Description"
@@ -90,11 +84,9 @@ export default function CreateClosetForm({
         }
       />
 
-
       <button type="submit">
         Create
       </button>
-
 
     </form>
   );

@@ -1,25 +1,17 @@
 import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
-import { UnauthorizedError } from '../errors/AppError';
+import { UnauthorizedError, ValidationError } from '../errors/AppError';
 import { revokedTokenRepository } from '../repositories/revokedToken.repository';
-
-interface JwtPayload {
-  userId: string;
-  email: string;
-}
+import { verifyAccessToken } from '../utils/token';
+import { jwtPayloadSchema } from '../schemas/auth.schema';
 
 export const authMiddleware = async (
   req: Request,
   _res: Response,
   next: NextFunction
 ): Promise<void> => {
-  const { token } = req.cookies ?? {};
+  const { token } = req.cookies;
 
-  if (!token) {
-    throw new UnauthorizedError('Missing token');
-  }
-
-  if (typeof token !== 'string') {
+  if (!token || typeof token !== 'string') {
     throw new UnauthorizedError('Missing token');
   }
 
@@ -30,18 +22,22 @@ export const authMiddleware = async (
     throw new UnauthorizedError('Token has been revoked');
   }
 
-  const secret = process.env.JWT_SECRET;
-
-  if (!secret) {
-    throw new Error('JWT_SECRET is not defined');
-  }
-
   try {
-    const decoded = jwt.verify(token, secret) as JwtPayload;
+    const decoded = verifyAccessToken(token);
+
+    const result = jwtPayloadSchema.safeParse(decoded);
+
+    if (!result.success) {
+      return next(
+        new ValidationError(
+          `Access token payload validation failed: ${result.error.message.toString()}`
+        )
+      );
+    }
 
     req.user = {
-      id: decoded.userId,
-      email: decoded.email,
+      id: result.data.userId,
+      email: result.data.email,
     };
 
     next();

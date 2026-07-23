@@ -1,23 +1,17 @@
 import { api } from "../api/axios";
 import type { Closet } from "../types/closet.types";
 
-
 export interface CreateClosetData {
   name: string;
   description?: string;
 }
-
 
 export interface UpdateClosetData {
   name?: string;
   description?: string;
 }
 
-
-
 export const closetApi = {
-
-
   async getMyClosets(): Promise<Closet[]> {
 
     const response =
@@ -26,8 +20,6 @@ export const closetApi = {
     return response.data;
 
   },
-
-
 
   async getById(
     id: string
@@ -39,8 +31,6 @@ export const closetApi = {
     return response.data;
 
   },
-
-
 
   async create(
     data: CreateClosetData
@@ -56,8 +46,6 @@ export const closetApi = {
 
   },
 
-
-
   async update(
     id: string,
     data: UpdateClosetData
@@ -72,8 +60,6 @@ export const closetApi = {
     return response.data;
 
   },
-
-
 
   async remove(
     id: string
