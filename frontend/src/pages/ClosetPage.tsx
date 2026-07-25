@@ -9,6 +9,7 @@ import { closetApi } from "../services/closetApi";
 import type { Closet } from "../types/closet.types";
 
 import ClosetDetail from "../component/ClosetDetail";
+import Header from "../component/Header/Header";
 
 
 export default function ClosetPage() {
@@ -50,6 +51,8 @@ export default function ClosetPage() {
 
   return (
     <>
+      <Header />
+
       <Title />
       <CreateClosetForm
 
