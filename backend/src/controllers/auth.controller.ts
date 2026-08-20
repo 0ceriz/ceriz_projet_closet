@@ -34,11 +34,14 @@ const login: RequestHandler<
   });
 };
 
-const me: RequestHandler = (req, res) => {
+const me: RequestHandler<unknown, AppUserPublic> = (req, res) => {
   res.status(200).json(req.user);
 };
 
-const logout: RequestHandler = async (req, res) => {
+const logout: RequestHandler<unknown, { message: string }> = async (
+  req,
+  res
+) => {
   const { token } = req.cookies as { token?: string };
 
   if (token) {
