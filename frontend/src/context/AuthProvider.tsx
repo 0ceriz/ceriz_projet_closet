@@ -82,9 +82,9 @@ export function AuthProvider({
 
   const value: AuthContextType = {
     user,
+    loading,
     login,
     logout,
-    loading,
   };
 
 

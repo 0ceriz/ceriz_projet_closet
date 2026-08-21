@@ -7,7 +7,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setLoading] = useState(false);
 
   const handleSubmit = async (
     e: React.FormEvent
@@ -85,9 +85,9 @@ export default function LoginPage() {
 
         <button
           type="submit"
-          disabled={loading}
+          disabled={isLoading}
         >
-          {loading
+          {isLoading
             ? "Connexion..."
             : "Login"
           }
