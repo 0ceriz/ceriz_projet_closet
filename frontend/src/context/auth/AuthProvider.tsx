@@ -11,8 +11,8 @@ import {
 
 import {
   authApi,
-} from "../services/authApi";
-import type { User } from "../types/auth.types";
+} from "../../services/authApi";
+import type { User } from "../../types/auth.types";
 interface Props {
   children: ReactNode;
 }
