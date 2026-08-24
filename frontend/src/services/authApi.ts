@@ -8,10 +8,17 @@ export interface LoginDTO {
 
 
 export const authApi = {
+async login(data: LoginDTO): Promise<void> {
+  console.log("API LOGIN : appel");
 
-  async login(data: LoginDTO): Promise<void> {
+  try {
     await api.post("/auth/login", data);
-  },
+    console.log("API LOGIN : succès");
+  } catch (error) {
+    console.log("API LOGIN : ERREUR", error);
+    throw error;
+  }
+},
 
   async logout(): Promise<void> {
     await api.post("/auth/logout");

@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
-import { ConflictError, NotFoundError } from '../errors/AppError';
+import { ConflictError, UnauthorizedError } from '../errors/AppError';
 import { appUserRepository } from '../repositories/appUser.repository';
 
 import { AppUserPublic, CreateAppUserDTO } from '../types/appUser.types';
@@ -58,14 +58,15 @@ const login = async (data: LoginDTO): Promise<string> => {
   const user = await appUserRepository.findByEmail(data.email);
 
   if (!user) {
-    throw new NotFoundError('User', data.email);
+    throw new UnauthorizedError('Invalid email or password');
   }
 
   const isMatch = await bcrypt.compare(data.password, user.password_hash);
 
   if (!isMatch) {
-    throw new ConflictError('Invalid credentials');
+    throw new UnauthorizedError('Invalid email or password');
   }
+
   const token = generateAccessToken({
     userId: user.id,
     email: user.email,

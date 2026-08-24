@@ -12,18 +12,29 @@ export default function LoginPage() {
   const handleSubmit = async (
     e: React.FormEvent
   ) => {
+      console.log("SUBMIT DÉCLENCHÉ");
+          
+  e.preventDefault();
 
-    e.preventDefault();
+  console.log("LOGIN PAGE : avant");
 
     setError(null);
     setLoading(true);
 
     try {
+try {
+  console.log("LOGIN PAGE : avant");
 
-      await login(
-        email,
-        password
-      );
+  await login(email, password);
+
+  console.log("LOGIN PAGE : succès");
+} catch (error) {
+  console.log("LOGIN PAGE : catch", error);
+
+  setError("Email ou mot de passe incorrect");
+} finally {
+  setLoading(false);
+}
 
     } catch {
 
