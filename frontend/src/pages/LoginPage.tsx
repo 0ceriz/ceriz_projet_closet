@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
+import axios from "axios";
 
 
 export default function LoginPage() {
@@ -13,7 +14,7 @@ export default function LoginPage() {
     e: React.FormEvent
   ) => {
       console.log("SUBMIT DÉCLENCHÉ");
-          
+
   e.preventDefault();
 
   console.log("LOGIN PAGE : avant");
@@ -21,32 +22,44 @@ export default function LoginPage() {
     setError(null);
     setLoading(true);
 
-    try {
 try {
-  console.log("LOGIN PAGE : avant");
+  console.log("[LOGIN] Tentative de connexion");
 
   await login(email, password);
 
-  console.log("LOGIN PAGE : succès");
+  console.log("[LOGIN] Connexion réussie");
 } catch (error) {
-  console.log("LOGIN PAGE : catch", error);
+  console.error("[LOGIN] Échec de la connexion");
 
-  setError("Email ou mot de passe incorrect");
+  if (axios.isAxiosError(error)) {
+    console.error("[LOGIN] Erreur Axios");
+    console.error("[LOGIN] Status :", error.response?.status);
+    console.error("[LOGIN] Data :", error.response?.data);
+
+    if (error.response?.status === 401) {
+      console.warn("[LOGIN] Identifiants invalides");
+
+      setError("Email ou mot de passe incorrect");
+    } else {
+      console.error("[LOGIN] Erreur serveur ou API");
+
+      setError(
+        "Une erreur est survenue. Veuillez réessayer."
+      );
+    }
+  } else {
+    console.error(
+      "[LOGIN] Erreur inattendue non-Axios :",
+      error
+    );
+
+    setError(
+      "Une erreur inattendue est survenue. Veuillez réessayer."
+    );
+  }
 } finally {
   setLoading(false);
 }
-
-    } catch {
-
-      setError(
-        "Email ou mot de passe incorrect"
-      );
-
-    } finally {
-
-      setLoading(false);
-
-    }
 
   };
 

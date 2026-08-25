@@ -68,17 +68,20 @@ export function AuthProvider({
     setUser(currentUser);
   };
 
-
-
-  const logout = async () => {
-
+const logout = async () => {
+  try {
     await authApi.logout();
 
+    console.log("[LOGOUT] Déconnexion réussie");
+  } catch (error) {
+    console.error(
+      "[LOGOUT] Impossible de contacter le serveur",
+      error
+    );
+  } finally {
     setUser(null);
-
-  };
-
-
+  }
+};
 
   const value: AuthContextType = {
     user,
@@ -86,7 +89,6 @@ export function AuthProvider({
     login,
     logout,
   };
-
 
   return (
     <AuthContext.Provider value={value}>
