@@ -4,6 +4,7 @@ import axios from 'axios';
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL, // = api.get("/auth/me");
   withCredentials: true,  // pour cookie HttpOnly
+  timeout: 10000,
   headers: {
     'Content-Type': 'application/json', // ajouté automatiquement sur tous les POST, PATCH, etc
   },

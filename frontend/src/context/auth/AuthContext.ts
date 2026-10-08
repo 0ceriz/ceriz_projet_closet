@@ -1,5 +1,5 @@
 import { createContext } from "react";
-import type { User } from "../../types/auth.types";
+import type { CreateAppUserDTO, User } from "../../types/auth.types";
 
 
 export interface AuthContextType {
@@ -10,11 +10,12 @@ export interface AuthContextType {
     password: string
   ): Promise<void>;
 
+ register(data: CreateAppUserDTO): Promise<void>;
+
   logout(): Promise<void>;
 
   loading: boolean;
 }
-
 
 export const AuthContext =
   createContext<AuthContextType | null>(null);

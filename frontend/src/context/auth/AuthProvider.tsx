@@ -12,7 +12,7 @@ import {
 import {
   authApi,
 } from "../../services/authApi";
-import type { User } from "../../types/auth.types";
+import type { CreateAppUserDTO, User } from "../../types/auth.types";
 interface Props {
   children: ReactNode;
 }
@@ -83,9 +83,33 @@ const logout = async () => {
   }
 };
 
+const register = async (
+  data: CreateAppUserDTO
+) => {
+  try {
+    await authApi.register(data);
+
+    const currentUser = await authApi.me();
+
+    setUser(currentUser);
+
+    console.log(
+      "[REGISTER] Inscription et connexion réussies"
+    );
+  } catch (error) {
+    console.error(
+      "[REGISTER] Échec de l'inscription",
+      error
+    );
+
+    throw error;
+  }
+};
+
   const value: AuthContextType = {
     user,
     loading,
+    register,
     login,
     logout,
   };
@@ -95,4 +119,6 @@ const logout = async () => {
       {children}
     </AuthContext.Provider>
   );
+
+  
 }

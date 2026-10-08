@@ -4,3 +4,10 @@ export interface User {
   pseudo: string;
   pictureUrl?: string | null;
 }
+
+export interface CreateAppUserDTO {
+  pseudo: string;
+  email: string;
+  password: string;
+  pictureUrl?: string | null;
+}
