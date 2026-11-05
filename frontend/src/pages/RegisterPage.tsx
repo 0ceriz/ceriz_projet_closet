@@ -117,7 +117,8 @@ export default function RegisterPage({
 } finally {
   setLoading(false);
 }
-
+    }
+  };
   return (
     <div>
       <h1>Register</h1>
@@ -200,4 +201,4 @@ export default function RegisterPage({
       </button>
     </div>
   );
-}}}
+}
