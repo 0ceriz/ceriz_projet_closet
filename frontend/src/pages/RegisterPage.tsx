@@ -5,9 +5,7 @@ interface RegisterPageProps {
   onBackToLogin: () => void;
 }
 
-export default function RegisterPage({
-  onBackToLogin,
-}: RegisterPageProps) {
+export default function RegisterPage({ onBackToLogin }: RegisterPageProps) {
   const { register } = useAuth();
 
   const [pseudo, setPseudo] = useState("");
@@ -36,106 +34,73 @@ export default function RegisterPage({
     const trimmedPictureUrl = pictureUrl.trim();
 
     // Pseudo
-    if (
-      trimmedPseudo.length < 3 ||
-      trimmedPseudo.length > 255
-    ) {
-      console.error(
-        "[REGISTER PAGE] Pseudo invalide"
-      );
+    if (trimmedPseudo.length < 3 || trimmedPseudo.length > 255) {
+      console.error("[REGISTER PAGE] Pseudo invalide");
 
-      setError(
-        "Échec de la création du compte."
-      );
+      setError("Échec de la création du compte.");
 
       return;
     }
 
     // Email
-    const emailIsValid =
-      /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
-        trimmedEmail
-      );
+    const emailIsValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail);
 
-    if (
-      !emailIsValid ||
-      trimmedEmail.length > 255
-    ) {
-      console.error(
-        "[REGISTER PAGE] Email invalide"
-      );
+    if (!emailIsValid || trimmedEmail.length > 255) {
+      console.error("[REGISTER PAGE] Email invalide");
 
-      setError(
-        "Échec de la création du compte."
-      );
+      setError("Échec de la création du compte.");
 
       return;
     }
 
     // Password
     if (password.length < 8) {
-      console.error(
-        "[REGISTER PAGE] Mot de passe trop court"
-      );
+      console.error("[REGISTER PAGE] Mot de passe trop court");
 
-      setError(
-        "Échec de la création du compte."
-      );
+      setError("Échec de la création du compte.");
 
       return;
     }
 
     // Picture URL (optionnelle)
     if (trimmedPictureUrl) {
-  try {
-  await register({
-    pseudo: trimmedPseudo,
-    email: trimmedEmail,
-    password,
-    pictureUrl: trimmedPictureUrl || null,
-  });
+      try {
+        await register({
+          pseudo: trimmedPseudo,
+          email: trimmedEmail,
+          password,
+          pictureUrl: trimmedPictureUrl || null,
+        });
 
-  console.log(
-    "[REGISTER PAGE] Inscription réussie"
-  );
+        console.log("[REGISTER PAGE] Inscription réussie");
 
-  setSuccess("Compte créé avec succès !");
+        setSuccess("Compte créé avec succès !");
 
-  setPseudo("");
-  setEmail("");
-  setPassword("");
-  setPictureUrl("");
-} catch (error) {
-  console.error(
-    "[REGISTER PAGE] Échec :",
-    error
-  );
+        setPseudo("");
+        setEmail("");
+        setPassword("");
+        setPictureUrl("");
+      } catch (error) {
+        console.error("[REGISTER PAGE] Échec :", error);
 
-  setError(
-    "Échec de la création du compte."
-  );
-} finally {
-  setLoading(false);
-}
+        setError("Échec de la création du compte.");
+      } finally {
+        setLoading(false);
+      }
     }
   };
   return (
     <div>
       <h1>Register</h1>
 
-      <form
-        onSubmit={handleSubmit}
-        noValidate
-      >
+      <form onSubmit={handleSubmit} noValidate>
         <div>
           <label>Pseudo</label>
 
           <input
             type="text"
             value={pseudo}
-            onChange={(e) =>
-              setPseudo(e.target.value)
-            }
+            onChange={(e) => setPseudo(e.target.value)}
           />
         </div>
 
@@ -145,9 +110,7 @@ export default function RegisterPage({
           <input
             type="email"
             value={email}
-            onChange={(e) =>
-              setEmail(e.target.value)
-            }
+            onChange={(e) => setEmail(e.target.value)}
           />
         </div>
 
@@ -157,9 +120,7 @@ export default function RegisterPage({
           <input
             type="password"
             value={password}
-            onChange={(e) =>
-              setPassword(e.target.value)
-            }
+            onChange={(e) => setPassword(e.target.value)}
           />
         </div>
 
@@ -169,34 +130,20 @@ export default function RegisterPage({
           <input
             type="url"
             value={pictureUrl}
-            onChange={(e) =>
-              setPictureUrl(e.target.value)
-            }
+            onChange={(e) => setPictureUrl(e.target.value)}
           />
         </div>
 
-        {error && (
-          <p>{error}</p>
-        )}
+        {error && <p>{error}</p>}
 
-        {success && (
-          <p>{success}</p>
-        )}
+        {success && <p>{success}</p>}
 
-        <button
-          type="submit"
-          disabled={isLoading}
-        >
-          {isLoading
-            ? "Création..."
-            : "Créer un compte"}
+        <button type="submit" disabled={isLoading}>
+          {isLoading ? "Création..." : "Créer un compte"}
         </button>
       </form>
 
-      <button
-        type="button"
-        onClick={onBackToLogin}
-      >
+      <button type="button" onClick={onBackToLogin}>
         Retour à la connexion
       </button>
     </div>

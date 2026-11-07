@@ -11,42 +11,25 @@ import type { Closet } from "../types/closet.types";
 import ClosetDetail from "../component/ClosetDetail";
 import Header from "../component/Header/Header";
 
-
 export default function ClosetPage() {
-  const [closets, setClosets] =
-    useState<Closet[]>([]);
-  const [loadingClosets, setLoadingClosets] =
-    useState(true);
-  const [selectedCloset, setSelectedCloset] =
-    useState<Closet | null>(null);
+  const [closets, setClosets] = useState<Closet[]>([]);
+  const [loadingClosets, setLoadingClosets] = useState(true);
+  const [selectedCloset, setSelectedCloset] = useState<Closet | null>(null);
 
   const loadClosets = async () => {
     try {
-
-      const data =
-        await closetApi.getMyClosets();
+      const data = await closetApi.getMyClosets();
 
       setClosets(data);
-
-    } catch(error) {
-
-      console.error(
-        "Erreur chargement closets",
-        error
-      );
-
+    } catch (error) {
+      console.error("Erreur chargement closets", error);
     } finally {
-
       setLoadingClosets(false);
-
     }
-
   };
 
   useEffect(() => {
-
     void loadClosets();
-
   }, []);
 
   return (
@@ -55,60 +38,30 @@ export default function ClosetPage() {
 
       <Title />
       <CreateClosetForm
-
         onCreated={() => {
           void loadClosets();
         }}
-
       />
-      <h2>
-        My closets
-      </h2>
-      {
-        loadingClosets ? (
+      <h2>My closets</h2>
+      {loadingClosets ? (
+        <p>Loading closets...</p>
+      ) : closets.length === 0 ? (
+        <p>No closet yet</p>
+      ) : (
+        <div>
+          {closets.map((closet) => (
+            <ClosetCard
+              key={closet.id}
 
-          <p>
-            Loading closets...
-          </p>
+              closet={closet}
 
-        ) : closets.length === 0 ? (
+              onClick={setSelectedCloset}
+            />
+          ))}
+        </div>
+      )}
 
-          <p>
-            No closet yet
-          </p>
-
-        ) : (
-          <div>
-            {
-              closets.map((closet) => (
-
-                <ClosetCard
-
-                  key={closet.id}
-
-                  closet={closet}
-
-                  onClick={setSelectedCloset}
-
-                />
-
-              ))
-            }
-
-          </div>
-
-        )
-      }
-
-{
-  selectedCloset && (
-
-    <ClosetDetail
-      closet={selectedCloset}
-    />
-
-  )
-}
+      {selectedCloset && <ClosetDetail closet={selectedCloset} />}
     </>
   );
 }

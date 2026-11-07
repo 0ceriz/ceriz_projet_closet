@@ -13,62 +13,30 @@ export interface UpdateClosetData {
 
 export const closetApi = {
   async getMyClosets(): Promise<Closet[]> {
-
-    const response =
-      await api.get("/closet/me");
+    const response = await api.get("/closet/me");
 
     return response.data;
-
   },
 
-  async getById(
-    id: string
-  ): Promise<Closet> {
-
-    const response =
-      await api.get(`/closet/${id}`);
+  async getById(id: string): Promise<Closet> {
+    const response = await api.get(`/closet/${id}`);
 
     return response.data;
-
   },
 
-  async create(
-    data: CreateClosetData
-  ): Promise<Closet> {
-
-    const response =
-      await api.post(
-        "/closet",
-        data
-      );
+  async create(data: CreateClosetData): Promise<Closet> {
+    const response = await api.post("/closet", data);
 
     return response.data;
-
   },
 
-  async update(
-    id: string,
-    data: UpdateClosetData
-  ): Promise<Closet> {
-
-    const response =
-      await api.patch(
-        `/closet/${id}`,
-        data
-      );
+  async update(id: string, data: UpdateClosetData): Promise<Closet> {
+    const response = await api.patch(`/closet/${id}`, data);
 
     return response.data;
-
   },
 
-  async remove(
-    id: string
-  ): Promise<void> {
-
-    await api.delete(
-      `/closet/${id}`
-    );
-
+  async remove(id: string): Promise<void> {
+    await api.delete(`/closet/${id}`);
   },
-
 };

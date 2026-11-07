@@ -1,110 +1,72 @@
-import {
-  useEffect,
-  useState,
-  type ReactNode,
-} from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
-import {
-  AuthContext,
-  type AuthContextType,
-} from "./AuthContext";
+import { AuthContext, type AuthContextType } from "./AuthContext";
 
-import {
-  authApi,
-} from "../../services/authApi";
+import { authApi } from "../../services/authApi";
 import type { CreateAppUserDTO, User } from "../../types/auth.types";
 interface Props {
   children: ReactNode;
 }
 
-export function AuthProvider({
-  children,
-}: Props) {
-
+export function AuthProvider({ children }: Props) {
   const [user, setUser] = useState<User | null>(null);
 
-  const [loading, setLoading] =
-    useState(true);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const checkAuth = async () => {
-
       try {
-
-        const currentUser =
-          await authApi.me();
+        const currentUser = await authApi.me();
 
         setUser(currentUser);
-
       } catch {
-
         setUser(null);
-
       } finally {
-
         setLoading(false);
-
       }
-
     };
 
     void checkAuth();
-
   }, []);
 
-  const login = async (
-    email: string,
-    password: string
-  ) => {
-
+  const login = async (email: string, password: string) => {
     await authApi.login({
       email,
       password,
     });
 
-    const currentUser =
-      await authApi.me();
+    const currentUser = await authApi.me();
 
     setUser(currentUser);
   };
 
-const logout = async () => {
-  try {
-    await authApi.logout();
+  const logout = async () => {
+    try {
+      await authApi.logout();
 
-    console.log("[LOGOUT] Déconnexion réussie");
-  } catch (error) {
-    console.error(
-      "[LOGOUT] Impossible de contacter le serveur",
-      error
-    );
-  } finally {
-    setUser(null);
-  }
-};
+      console.log("[LOGOUT] Déconnexion réussie");
+    } catch (error) {
+      console.error("[LOGOUT] Impossible de contacter le serveur", error);
+    } finally {
+      setUser(null);
+    }
+  };
 
-const register = async (
-  data: CreateAppUserDTO
-) => {
-  try {
-    await authApi.register(data);
+  const register = async (data: CreateAppUserDTO) => {
+    try {
+      await authApi.register(data);
 
-    const currentUser = await authApi.me();
+      const currentUser = await authApi.me();
 
-    setUser(currentUser);
+      setUser(currentUser);
 
-    console.log(
-      "[REGISTER] Inscription et connexion réussies"
-    );
-  } catch (error) {
-    console.error(
-      "[REGISTER] Échec de l'inscription",
-      error
-    );
+      console.log("[REGISTER] Inscription et connexion réussies");
+    } catch (error) {
+      console.error("[REGISTER] Échec de l'inscription", error);
 
-    throw error;
-  }
-};
+      throw error;
+    }
+  };
 
   const value: AuthContextType = {
     user,
@@ -114,11 +76,5 @@ const register = async (
     logout,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
-
-  
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

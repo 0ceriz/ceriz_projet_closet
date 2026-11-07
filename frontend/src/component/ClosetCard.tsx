@@ -1,17 +1,11 @@
 import type { Closet } from "../types/closet.types";
 
-
 interface Props {
   closet: Closet;
   onClick: (closet: Closet) => void;
 }
 
-
-export default function ClosetCard({
-  closet,
-  onClick,
-}: Props) {
-
+export default function ClosetCard({ closet, onClick }: Props) {
   return (
     <div
       onClick={() => onClick(closet)}
@@ -22,18 +16,8 @@ export default function ClosetCard({
         cursor: "pointer",
       }}
     >
-      <h3>
-        {closet.name}
-      </h3>
-      {
-        closet.description && (
-          <p>
-            {closet.description}
-          </p>
-
-        )
-      }
+      <h3>{closet.name}</h3>
+      {closet.description && <p>{closet.description}</p>}
     </div>
-
   );
 }

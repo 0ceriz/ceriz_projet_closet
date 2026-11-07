@@ -17,7 +17,6 @@ export interface Closet {
 }
 
 export interface Closet {
-
   id: string;
 
   name: string;
@@ -29,5 +28,4 @@ export interface Closet {
   created_at: string;
 
   updated_at?: string | null;
-
 }

@@ -2,12 +2,29 @@ import { useState, type FormEvent } from "react";
 import { useAuth } from "../hooks/useAuth";
 import axios from "axios";
 
+import {
+  Container,
+  Box,
+  TextField,
+  Typography,
+  Button,
+  Alert,
+  InputAdornment,
+  IconButton,
+} from "@mui/material";
+import EmailIcon from "@mui/icons-material/Email";
+import LockIcon from "@mui/icons-material/Lock";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+
 interface LoginPageProps {
   onRegister: () => void;
+  onForgotPassword: () => void;
 }
 
 export default function LoginPage({
   onRegister,
+  onForgotPassword,
 }: LoginPageProps) {
   const { login } = useAuth();
 
@@ -15,13 +32,10 @@ export default function LoginPage({
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = async (e: FormEvent) => {
-    console.log("SUBMIT DÉCLENCHÉ");
-
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    console.log("LOGIN PAGE : avant");
 
     setError(null);
     setLoading(true);
@@ -33,45 +47,16 @@ export default function LoginPage({
 
       console.log("[LOGIN] Connexion réussie");
     } catch (error) {
-      console.error("[LOGIN] Échec de la connexion");
+      console.error("[LOGIN] Échec de la connexion", error);
 
       if (axios.isAxiosError(error)) {
-        console.error("[LOGIN] Erreur Axios");
-        console.error(
-          "[LOGIN] Status :",
-          error.response?.status
-        );
-        console.error(
-          "[LOGIN] Data :",
-          error.response?.data
-        );
-
         if (error.response?.status === 401) {
-          console.warn(
-            "[LOGIN] Identifiants invalides"
-          );
-
-          setError(
-            "Email ou mot de passe incorrect"
-          );
+          setError("Email ou mot de passe incorrect");
         } else {
-          console.error(
-            "[LOGIN] Erreur serveur ou API"
-          );
-
-          setError(
-            "Une erreur est survenue. Veuillez réessayer."
-          );
+          setError("Une erreur est survenue. Veuillez réessayer.");
         }
       } else {
-        console.error(
-          "[LOGIN] Erreur inattendue non-Axios :",
-          error
-        );
-
-        setError(
-          "Une erreur inattendue est survenue. Veuillez réessayer."
-        );
+        setError("Une erreur inattendue est survenue.");
       }
     } finally {
       setLoading(false);
@@ -79,60 +64,144 @@ export default function LoginPage({
   };
 
   return (
-    <>
-      <div>
-        <h1>Login</h1>
+    <Box
+      sx={{
+        minHeight: "100vh",
+        width: "100%",
+        background: "linear-gradient(135deg, #FFFE91, #FC94D5, #B82F98)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        py: 4,
+      }}
+    >
+      <Container maxWidth="sm">
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          autoComplete="on"
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+            width: "100%",
+            maxWidth: "400px",
+            mx: "auto",
+            p: 4,
+            backgroundColor: "#FFFFFF",
+            borderRadius: 3,
+            boxShadow: "0 12px 40px rgba(0,0,0,0.2)",
+          }}
+        >
+          <Typography variant="h4" component="h1" sx={{ textAlign: "center" }}>
+            Login
+          </Typography>
 
-        <form onSubmit={handleSubmit}>
-          <div>
-            <label>Email</label>
+          {error && (
+            <Alert severity="error" onClose={() => setError(null)}>
+              {error}
+            </Alert>
+          )}
 
-            <input
+          <Box>
+            <Typography sx={{ mb: 1 }}>Email</Typography>
+            <TextField
+              placeholder="Email"
               type="email"
               value={email}
-              onChange={(e) =>
-                setEmail(e.target.value)
-              }
+              onChange={(e) => setEmail(e.target.value)}
               required
+              fullWidth
+              slotProps={{
+                input: {
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <EmailIcon color="action" />
+                    </InputAdornment>
+                  ),
+                },
+              }}
             />
-          </div>
+          </Box>
 
-          <div>
-            <label>Password</label>
-
-            <input
-              type="password"
+          <Box>
+            <Typography sx={{ mb: 1 }}>Password</Typography>
+            <TextField
+              type={showPassword ? "text" : "password"}
+              placeholder="Password"
               value={password}
-              onChange={(e) =>
-                setPassword(e.target.value)
-              }
+              onChange={(e) => setPassword(e.target.value)}
               required
+              fullWidth
+              slotProps={{
+                input: {
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <LockIcon color="action" />
+                    </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        edge="end"
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                },
+              }}
             />
-          </div>
+          </Box>
 
-          {error && <p>{error}</p>}
-
-          <button
+          <Button
             type="submit"
+            variant="contained"
             disabled={isLoading}
+            fullWidth
+            sx={{
+              height: "48px",
+              backgroundColor: "#817CCC",
+              "&:hover": {
+                backgroundColor: "#6D67B5",
+              },
+            }}
           >
-            {isLoading
-              ? "Connexion..."
-              : "Login"}
-          </button>
-        </form>
-      </div>
+            {isLoading ? "Connexion..." : "Login"}
+          </Button>
 
-      <div>
-        <span>Pas encore de compte ? </span>
+          <Box sx={{ textAlign: "center", mt: 1 }}>
+            <Button
+              type="button"
+              variant="text"
+              onClick={onForgotPassword}
+              sx={{
+                color: "black",
+                textTransform: "none",
+                fontWeight: 400,
+              }}
+            >
+              Mot de passe oublié ?
+            </Button>
+          </Box>
 
-        <button
-          type="button"
-          onClick={onRegister}
-        >
-          Créer un compte
-        </button>
-      </div>
-    </>
+          <Box sx={{ textAlign: "center", mt: 1 }}>
+            <Typography component="span">Pas encore de compte ?</Typography>
+            <Button
+              type="button"
+              variant="text"
+              onClick={onRegister}
+              sx={{
+                color: "#6D67B5",
+              }}
+            >
+              Créer un compte
+            </Button>
+          </Box>
+        </Box>
+      </Container>
+    </Box>
   );
 }

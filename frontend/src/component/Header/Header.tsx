@@ -11,9 +11,7 @@ export default function Header() {
       <div>
         <span>{user?.pseudo}</span>
 
-        <button type="button">
-          Profile
-        </button>
+        <button type="button">Profile</button>
 
         <LogoutButton />
       </div>

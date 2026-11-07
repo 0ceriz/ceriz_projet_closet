@@ -7,13 +7,9 @@ import RegisterPage from "./pages/RegisterPage";
 import ClosetPage from "./pages/ClosetPage";
 
 function App() {
-  const {
-    user,
-    loading,
-  } = useAuth();
+  const { user, loading } = useAuth();
 
-  const [isRegistering, setIsRegistering] =
-    useState(false);
+  const [isRegistering, setIsRegistering] = useState(false);
 
   if (loading) {
     return <p>Loading...</p>;
@@ -21,22 +17,10 @@ function App() {
 
   if (!user) {
     if (isRegistering) {
-      return (
-        <RegisterPage
-          onBackToLogin={() =>
-            setIsRegistering(false)
-          }
-        />
-      );
+      return <RegisterPage onBackToLogin={() => setIsRegistering(false)} />;
     }
 
-    return (
-      <LoginPage
-        onRegister={() =>
-          setIsRegistering(true)
-        }
-      />
-    );
+    return <LoginPage onRegister={() => setIsRegistering(true)} />;
   }
 
   return <ClosetPage />;
