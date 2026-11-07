@@ -1,110 +1,34 @@
 import { useState } from "react";
-import type { Closet, ClothingItem } from "./types/closet.types";
-import Title from "./component/Title";
 
-import "./App.css";
-import InfoSection from "./component/InfoSection";
-import ClosetControls from "./component/ClosetControls";
-import Modal from "./component/Modal";
-import AddClothingItemForm from "./component/AddClothingItemForm";
+import { useAuth } from "./hooks/useAuth";
+
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import ClosetPage from "./pages/ClosetPage";
 
 function App() {
-  // ----- STATE MANAGEMENT
-  const [infoMessage, setInfoMessage] = useState<string | null>(null);
-  const [closet, setCloset] = useState<Closet>({
-    isOpen: false,
-    clothes: [],
-  });
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { user, loading } = useAuth();
 
-  // ----- FUNCTIONS TO MANAGE CLOSET STATE -----
-  const openCloset = () => {
-    setCloset((prevCloset) => ({ ...prevCloset, isOpen: true }));
-  };
-  const closeCloset = () => {
-    setCloset((prevCloset) => ({ ...prevCloset, isOpen: false }));
-  };
-  const addClothingItem = (item: ClothingItem) => {
-    setCloset((prevCloset) => ({
-      ...prevCloset,
-      clothes: [...prevCloset.clothes, item],
-    }));
-  };
-  const removeClothingItem = (id: number) => {
-    setCloset((prevCloset) => ({
-      ...prevCloset,
-      clothes: prevCloset.clothes.filter((item) => item.id !== id),
-    }));
-  };
+  const [isRegistering, setIsRegistering] = useState(false);
 
-  // ----- EVENT HANDLERS -----
-  const handleOpenCloset = () => {
-    openCloset();
-    setInfoMessage("Closet is now open !");
-  };
+  if (loading) {
+    return <p>Loading...</p>;
+  }
 
-  const handleCloseCloset = () => {
-    closeCloset();
-    setInfoMessage("Closet is now closed !");
-  };
+  if (!user) {
+    if (isRegistering) {
+      return <RegisterPage onBackToLogin={() => setIsRegistering(false)} />;
+    }
 
-  const handleAddItem = (newItem: ClothingItem) => {
-    addClothingItem(newItem);
-    setIsModalOpen(false);
-    setInfoMessage("Added a new clothing item !");
-  };
-
-  const handleRemoveItem = (id: number) => {
-    removeClothingItem(id);
-    setInfoMessage("Removed a clothing item !");
-  };
-
-  return (
-    <>
-      <Title />
-      <InfoSection infoMessage={infoMessage} />
-      <ClosetControls
-        closetIsOpen={closet.isOpen}
-        onOpen={handleOpenCloset}
-        onClose={handleCloseCloset}
-        onAddItem={() => setIsModalOpen(true)}
+    return (
+      <LoginPage
+        onRegister={() => setIsRegistering(true)}
+        onForgotPassword={() => setIsRegistering(true)}
       />
+    );
+  }
 
-      {/* CLOTHING ITEMS LIST */}
-      {closet.isOpen && (
-        <div>
-          <h2>Clothing Items:</h2>
-          {closet.clothes.length === 0 ? (
-            <p>No clothing items in the closet.</p>
-          ) : (
-            <ul>
-              {closet.clothes.map((item) => (
-                <li key={item.id}>
-                  {item.name} - {item.type.category} ({item.style}, {item.color}
-                  )
-                  <button onClick={() => handleRemoveItem(item.id)}>
-                    Remove
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      )}
-
-      <Modal
-        isOpen={isModalOpen}
-        title="Add Clothing Item"
-        onClose={() => setIsModalOpen(false)}
-      >
-        <AddClothingItemForm
-          onAdd={(newItem) => {
-            handleAddItem(newItem);
-          }}
-        />
-      </Modal>
-    </>
-  );
+  return <ClosetPage />;
 }
 
 export default App;

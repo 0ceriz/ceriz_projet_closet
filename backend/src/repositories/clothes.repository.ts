@@ -4,7 +4,7 @@ import {
   ClothingItem,
   CreateClothingItemDTO,
   UpdateClothingItemDTO,
-} from '../types/closet.types';
+} from '../types/clothing.types';
 
 const clothes: ClothingItem[] = [
   {

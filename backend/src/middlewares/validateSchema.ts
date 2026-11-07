@@ -4,8 +4,13 @@ import { ValidationError } from '../errors/AppError';
 
 export const validateBody = (schema: z.ZodSchema) => {
   return (req: Request, _res: Response, next: NextFunction): void => {
+    console.log('[VALIDATION] req.body =', req.body);
     const result = schema.safeParse(req.body);
     if (!result.success) {
+      console.error(
+        '[VALIDATION] Zod errors =',
+        result.success ? null : result.error.issues
+      );
       return next(
         new ValidationError(
           `Body validation failed: ${result.error.message.toString()}`

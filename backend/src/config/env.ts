@@ -25,6 +25,10 @@ const envSchema = z.object({
     .number({ message: 'Invalid POSTGRES_PORT number' })
     .min(1, { message: 'Invalid POSTGRES_PORT number' })
     .max(65535, { message: 'Invalid POSTGRES_PORT number' }),
+
+  JWT_ACCESS_TOKEN_SECRET: z
+    .string()
+    .min(1, { message: 'JWT_ACCESS_TOKEN_SECRET is required' }),
 });
 
 export type Env = z.infer<typeof envSchema>;
