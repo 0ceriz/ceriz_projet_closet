@@ -20,7 +20,12 @@ function App() {
       return <RegisterPage onBackToLogin={() => setIsRegistering(false)} />;
     }
 
-    return <LoginPage onRegister={() => setIsRegistering(true)} />;
+    return (
+      <LoginPage
+        onRegister={() => setIsRegistering(true)}
+        onForgotPassword={() => setIsRegistering(true)}
+      />
+    );
   }
 
   return <ClosetPage />;
