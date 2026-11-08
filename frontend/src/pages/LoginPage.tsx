@@ -68,7 +68,7 @@ export default function LoginPage({
       sx={{
         minHeight: "100vh",
         width: "100%",
-        background: "linear-gradient(135deg, #FFFE91, #FC94D5, #B82F98)",
+        background: "linear-gradient(135deg, #FFFE91, #C46E41, #8C2C1F)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -178,9 +178,8 @@ export default function LoginPage({
               variant="text"
               onClick={onForgotPassword}
               sx={{
-                color: "black",
+                color: "#6D67B5",
                 textTransform: "none",
-                fontWeight: 400,
               }}
             >
               Mot de passe oublié ?
