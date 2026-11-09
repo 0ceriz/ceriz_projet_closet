@@ -6,12 +6,13 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ClosetPage from "./pages/ClosetPage";
+import ProfilePage from "./pages/ProfilePage";
 
-type Page = "login" | "register" | "forgotPassword";
+type Page = "login" | "register" | "forgotPassword" | "profile";
 
 const handleForgotPassword = async (email: string) => {
   console.log("Email renseigné :", email);
-}; //mesure temporaire pour tester le formulaire de mot de passe oublié
+};
 
 function App() {
   const { user, loading } = useAuth();
@@ -45,7 +46,11 @@ function App() {
     }
   }
 
-  return <ClosetPage />;
+  if (currentPage === "profile") {
+    return <ProfilePage onBack={() => setCurrentPage("login")} />;
+  }
+
+  return <ClosetPage onProfile={() => setCurrentPage("profile")} />;
 }
 
 export default App;
