@@ -11,3 +11,9 @@ export interface CreateAppUserDTO {
   password: string;
   pictureUrl?: string | null;
 }
+
+export interface UpdateProfileDTO {
+  pseudo?: string;
+  email?: string;
+  pictureUrl?: string | null;
+}

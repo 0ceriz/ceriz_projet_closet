@@ -1,47 +1,62 @@
-import { ConflictError, NotFoundError } from '../errors/AppError';
 import bcrypt from 'bcrypt';
+
+import {
+  ConflictError,
+  NotFoundError,
+  UnauthorizedError,
+  ForbiddenError,
+} from '../errors/AppError';
+
 import { appUserRepository } from '../repositories/appUser.repository';
+
 import {
   AppUserId,
   AppUserPublic,
   CreateAppUserDTO,
-} from '../types/appUser.types';
-import { mapAppUserDbToPublic } from '../mappers/appUser.mapper';
-import {
   UpdateAppUserDTO,
   UpdateAppUserRepositoryData,
 } from '../types/appUser.types';
-import { ForbiddenError } from '../errors/AppError';
+
+import { mapAppUserDbToPublic } from '../mappers/appUser.mapper';
 import { hashPassword } from '../utils/hash';
 
 const getAll = async (): Promise<AppUserPublic[]> => {
   const users = await appUserRepository.findAll();
+
   return users.map((user) => mapAppUserDbToPublic(user));
 };
 
 const getById = async (id: AppUserId): Promise<AppUserPublic> => {
   const user = await appUserRepository.findById(id);
+
   if (!user) {
-    throw new NotFoundError(`app_user`, id);
+    throw new NotFoundError('app_user', id);
   }
+
   return mapAppUserDbToPublic(user);
 };
 
 const create = async (data: CreateAppUserDTO): Promise<AppUserPublic> => {
-  // Check if the user already exists
+  // Vérifier si l'adresse email existe déjà
   const existingUserByEmail = await appUserRepository.findByEmail(data.email);
-  if (existingUserByEmail)
+
+  if (existingUserByEmail) {
     throw new ConflictError(`Email already used: ${data.email}`);
+  }
+
+  // Vérifier si le pseudo existe déjà
   const existingUserByPseudo = await appUserRepository.findByPseudo(
     data.pseudo
   );
-  if (existingUserByPseudo)
+
+  if (existingUserByPseudo) {
     throw new ConflictError(`Pseudo already used: ${data.pseudo}`);
+  }
 
-  // TODO: Hash the password
-  const passwordHash = await bcrypt.hash(data.password, 10);
+  // Hasher le mot de passe
+  const passwordHash = await hashPassword(data.password);
 
-  // Create the user
+  // Créer l'utilisateur
   const createdUser = await appUserRepository.create({
     pseudo: data.pseudo,
     email: data.email,
@@ -57,18 +72,18 @@ const updateById = async (
   data: UpdateAppUserDTO,
   authenticatedUserId: AppUserId
 ): Promise<AppUserPublic> => {
-  // Check if the user exists
   const existingUser = await appUserRepository.findById(id);
+
   if (!existingUser) {
     throw new NotFoundError('app_user', id);
   }
 
-  // Check that the authenticated user owns this account
+  // Vérifier que l'utilisateur modifie son propre compte
   if (id !== authenticatedUserId) {
     throw new ForbiddenError('You are not allowed to update this user');
   }
 
-  // Check if the email is already used by another user
+  // Vérifier l'unicité de l'adresse email
   if (data.email && data.email !== existingUser.email) {
     const existingUserByEmail = await appUserRepository.findByEmail(data.email);
 
@@ -77,7 +92,7 @@ const updateById = async (
     }
   }
 
-  // Check if the pseudo is already used by another user
+  // Vérifier l'unicité du pseudo
   if (data.pseudo && data.pseudo !== existingUser.pseudo) {
     const existingUserByPseudo = await appUserRepository.findByPseudo(
       data.pseudo
@@ -88,14 +103,7 @@ const updateById = async (
     }
   }
 
-  // Hash the password if provided
-  let passwordHash: string | undefined;
-
-  if (data.password !== undefined) {
-    passwordHash = await hashPassword(data.password);
-  }
-
-  // Build the update payload
+  // Préparer les données à mettre à jour
   const updatePayload: UpdateAppUserRepositoryData = {};
 
   if (data.pseudo !== undefined) {
@@ -106,16 +114,14 @@ const updateById = async (
     updatePayload.email = data.email;
   }
 
-  if (passwordHash !== undefined) {
-    updatePayload.passwordHash = passwordHash;
-  }
-
   if (data.pictureUrl !== undefined) {
     updatePayload.pictureUrl = data.pictureUrl;
   }
 
+  // Le mot de passe ne doit être traité que par son endpoint dédié
+  // PATCH /users/me/password
+
   try {
-    // Update the user
     const updatedUser = await appUserRepository.updateById(id, updatePayload);
 
     if (!updatedUser) {
@@ -124,9 +130,6 @@ const updateById = async (
 
     return mapAppUserDbToPublic(updatedUser);
   } catch (error: unknown) {
-    // PostgreSQL UNIQUE constraint violation (error code 23505).
-    // This can happen if two concurrent requests update the same
-    // email or pseudo at the same time.
     if (
       typeof error === 'object' &&
       error !== null &&
@@ -140,14 +143,24 @@ const updateById = async (
   }
 };
 
+// Supprimer un compte utilisateur
 const deleteById = async (
   id: AppUserId,
   authenticatedUserId: AppUserId
 ): Promise<void> => {
+  // Vérifier que l'utilisateur supprime uniquement son propre compte
   if (id !== authenticatedUserId) {
     throw new ForbiddenError('You are not allowed to delete this user');
   }
 
+  // Vérifier que le compte existe
+  const existingUser = await appUserRepository.findById(id);
+
+  if (!existingUser) {
+    throw new NotFoundError('app_user', id);
+  }
+
+  // Supprimer le compte
   const deleted = await appUserRepository.deleteById(id);
 
   if (!deleted) {
@@ -155,7 +168,36 @@ const deleteById = async (
   }
 };
 
+// Modifier le mot de passe
+const changePassword = async (
+  userId: AppUserId,
+  currentPassword: string,
+  newPassword: string
+): Promise<void> => {
+  const user = await appUserRepository.findById(userId);
+
+  if (!user) {
+    throw new NotFoundError('User not found');
+  }
+
+  const isPasswordValid = await bcrypt.compare(
+    currentPassword,
+    user.password_hash
+  );
+
+  if (!isPasswordValid) {
+    throw new UnauthorizedError('Current password is incorrect');
+  }
+
+  const passwordHash = await hashPassword(newPassword);
+
+  await appUserRepository.updateById(userId, {
+    passwordHash,
+  });
+};
+
 export const appUserService = {
+  changePassword,
   getAll,
   getById,
   create,

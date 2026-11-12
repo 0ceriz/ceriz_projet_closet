@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 import {
   Box,
   Container,
@@ -16,6 +17,7 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
+  Alert,
 } from "@mui/material";
 
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -29,6 +31,7 @@ import LockIcon from "@mui/icons-material/Lock";
 import PersonIcon from "@mui/icons-material/Person";
 import EmailIcon from "@mui/icons-material/Email";
 
+import { passwordApi } from "../services/passwordApi";
 import { useAuth } from "../hooks/useAuth";
 
 interface ProfilePageProps {
@@ -52,36 +55,139 @@ const buttonStyle = {
 };
 
 export default function ProfilePage({ onBack }: ProfilePageProps) {
-  const { user } = useAuth();
+  const { user, updateProfile, deleteAccount } = useAuth();
 
+  // Informations personnelles
   const [pseudo, setPseudo] = useState(user?.pseudo ?? "");
   const [email, setEmail] = useState(user?.email ?? "");
   const [pictureUrl, setPictureUrl] = useState(user?.pictureUrl ?? "");
 
+  // Mot de passe
   const [password, setPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
+  // Préférences
   const [notifications, setNotifications] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
 
+  // Suppression du compte
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
-  const handleUpdateAccount = () => {
-    console.log("Mise à jour du compte", {
-      pseudo,
-      email,
-      pictureUrl,
-      password,
-      newPassword,
-      notifications,
-      darkMode,
-    });
+  // Mise à jour du profil
+  const [saving, setSaving] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
+  // Changement du mot de passe
+  const [savingPassword, setSavingPassword] = useState(false);
+  const [passwordSuccess, setPasswordSuccess] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+
+  // Validation de l'adresse email
+  const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+
+  // Mise à jour du profil
+  const handleUpdateAccount = async () => {
+    setSuccessMessage("");
+    setErrorMessage("");
+
+    if (pseudo.trim().length < 3) {
+      setErrorMessage("Le pseudo doit contenir au moins 3 caractères.");
+      return;
+    }
+
+    if (!email.trim() || !isEmailValid) {
+      setErrorMessage("Veuillez saisir une adresse email valide.");
+      return;
+    }
+
+    setSaving(true);
+
+    try {
+      await updateProfile({
+        pseudo: pseudo.trim(),
+        email: email.trim(),
+        pictureUrl: pictureUrl.trim() || null,
+      });
+
+      setSuccessMessage("Votre profil a été mis à jour avec succès !");
+    } catch (error) {
+      console.error(
+        "[PROFILE] Erreur lors de la modification du profil :",
+        error,
+      );
+
+      setErrorMessage(
+        "Impossible de modifier votre profil. Cette adresse email est peut-être déjà utilisée.",
+      );
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const handleDeleteAccount = () => {
-    console.log("Suppression du compte");
-    setOpenDeleteDialog(false);
+  // Changement du mot de passe
+  const handleChangePassword = async () => {
+    setPasswordSuccess("");
+    setPasswordError("");
+
+    if (!password || !newPassword) {
+      setPasswordError("Veuillez remplir les deux champs.");
+      return;
+    }
+
+    if (newPassword.length < 8) {
+      setPasswordError(
+        "Le nouveau mot de passe doit contenir au moins 8 caractères.",
+      );
+      return;
+    }
+
+    if (password === newPassword) {
+      setPasswordError(
+        "Le nouveau mot de passe doit être différent de l'ancien.",
+      );
+      return;
+    }
+
+    setSavingPassword(true);
+
+    try {
+      await passwordApi.changePassword({
+        currentPassword: password,
+        newPassword: newPassword,
+      });
+
+      setPassword("");
+      setNewPassword("");
+
+      setPasswordSuccess("Votre mot de passe a été modifié avec succès !");
+    } catch (error) {
+      console.error("[PASSWORD] Échec du changement de mot de passe :", error);
+
+      setPasswordError(
+        "Impossible de modifier le mot de passe. Vérifiez votre mot de passe actuel.",
+      );
+    } finally {
+      setSavingPassword(false);
+    }
+  };
+
+  // Suppression du compte
+  const handleDeleteAccount = async () => {
+    try {
+      console.log("[DELETE] Début de la suppression");
+
+      await deleteAccount();
+
+      console.log("[DELETE] Suppression terminée");
+      setOpenDeleteDialog(false);
+
+      console.log("[DELETE] Appel de onBack");
+      onBack();
+    } catch (error) {
+      console.error("[DELETE] Erreur :", error);
+    }
   };
 
   return (
@@ -119,7 +225,6 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
           <Typography
             variant="h4"
             component="h1"
-
             sx={{
               fontWeight: "bold",
               textAlign: "center",
@@ -131,7 +236,11 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
           </Typography>
 
           <Typography
-            sx={{ textAlign: "center", color: "text.secondary", mb: 4 }}
+            sx={{
+              textAlign: "center",
+              color: "text.secondary",
+              mb: 4,
+            }}
           >
             Gérez vos informations personnelles
           </Typography>
@@ -188,12 +297,17 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
           <Box sx={{ mb: 4 }}>
             <Typography
               variant="h6"
-              sx={{ fontWeight: "bold", mb: 2, color: "#817CCC" }}
+              sx={{
+                fontWeight: "bold",
+                mb: 2,
+                color: "#817CCC",
+              }}
             >
               <PersonIcon sx={{ verticalAlign: "middle", mr: 1 }} />
               Informations personnelles
             </Typography>
 
+            {/* PSEUDO */}
             <TextField
               label="Pseudo"
               value={pseudo}
@@ -211,6 +325,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
               }}
             />
 
+            {/* ADRESSE EMAIL */}
             <TextField
               label="Adresse email"
               type="email"
@@ -218,6 +333,12 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
               onChange={(e) => setEmail(e.target.value)}
               fullWidth
               margin="normal"
+              error={email.trim() !== "" && !isEmailValid}
+              helperText={
+                email.trim() !== "" && !isEmailValid
+                  ? "Veuillez saisir une adresse email valide."
+                  : "Vous pouvez modifier l'adresse email associée à votre compte."
+              }
               slotProps={{
                 input: {
                   startAdornment: (
@@ -233,15 +354,20 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
           <Divider sx={{ mb: 3 }} />
 
           {/* SÉCURITÉ */}
-          <Box sx={{ mb: 4 }}>
+          <Box sx={{ mb: 3 }}>
             <Typography
               variant="h6"
-              sx={{ fontWeight: "bold", mb: 2, color: "#817CCC" }}
+              sx={{
+                fontWeight: "bold",
+                mb: 2,
+                color: "#817CCC",
+              }}
             >
               <LockIcon sx={{ verticalAlign: "middle", mr: 1 }} />
               Sécurité
             </Typography>
 
+            {/* MOT DE PASSE ACTUEL */}
             <TextField
               label="Mot de passe actuel"
               type={showPassword ? "text" : "password"}
@@ -249,6 +375,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
               onChange={(e) => setPassword(e.target.value)}
               fullWidth
               margin="normal"
+              autoComplete="current-password"
               slotProps={{
                 input: {
                   startAdornment: (
@@ -261,6 +388,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
                       <IconButton
                         onClick={() => setShowPassword(!showPassword)}
                         edge="end"
+                        aria-label="Afficher ou masquer les mots de passe"
                       >
                         {showPassword ? <VisibilityOff /> : <Visibility />}
                       </IconButton>
@@ -270,6 +398,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
               }}
             />
 
+            {/* NOUVEAU MOT DE PASSE */}
             <TextField
               label="Nouveau mot de passe"
               type={showPassword ? "text" : "password"}
@@ -277,8 +406,41 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
               onChange={(e) => setNewPassword(e.target.value)}
               fullWidth
               margin="normal"
+              autoComplete="new-password"
+              helperText="8 caractères minimum"
             />
           </Box>
+
+          {/* MESSAGES DU MOT DE PASSE */}
+          {passwordSuccess && (
+            <Alert severity="success" sx={{ mb: 2 }}>
+              {passwordSuccess}
+            </Alert>
+          )}
+
+          {passwordError && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {passwordError}
+            </Alert>
+          )}
+
+          {/* BOUTON CHANGEMENT MOT DE PASSE */}
+          <Button
+            variant="contained"
+            fullWidth
+            onClick={handleChangePassword}
+            disabled={savingPassword}
+            sx={{
+              ...buttonStyle,
+              height: 45,
+              mb: 3,
+              fontWeight: "bold",
+            }}
+          >
+            {savingPassword
+              ? "Modification en cours..."
+              : "Modifier mon mot de passe"}
+          </Button>
 
           <Divider sx={{ mb: 3 }} />
 
@@ -286,7 +448,11 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
           <Box sx={{ mb: 4 }}>
             <Typography
               variant="h6"
-              sx={{ fontWeight: "bold", mb: 2, color: "#817CCC" }}
+              sx={{
+                fontWeight: "bold",
+                mb: 2,
+                color: "#817CCC",
+              }}
             >
               <SettingsIcon sx={{ verticalAlign: "middle", mr: 1 }} />
               Préférences
@@ -317,12 +483,26 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
             />
           </Box>
 
-          {/* ENREGISTRER */}
+          {/* MESSAGES DU PROFIL */}
+          {successMessage && (
+            <Alert severity="success" sx={{ mb: 2 }}>
+              {successMessage}
+            </Alert>
+          )}
+
+          {errorMessage && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {errorMessage}
+            </Alert>
+          )}
+
+          {/* ENREGISTRER LE PROFIL */}
           <Button
             variant="contained"
             fullWidth
             startIcon={<SaveIcon />}
             onClick={handleUpdateAccount}
+            disabled={saving}
             sx={{
               ...buttonStyle,
               height: 48,
@@ -330,7 +510,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
               fontWeight: "bold",
             }}
           >
-            Enregistrer les modifications
+            {saving ? "Enregistrement..." : "Enregistrer les modifications"}
           </Button>
 
           <Divider sx={{ mb: 3 }} />

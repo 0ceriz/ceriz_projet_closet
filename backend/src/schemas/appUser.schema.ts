@@ -26,4 +26,19 @@ export const registerSchema = z
   })
   .strict();
 
+export const changePasswordSchema = z
+  .object({
+    currentPassword: z
+      .string()
+      .min(1, 'Le mot de passe actuel est obligatoire'),
+    newPassword: z
+      .string()
+      .min(8, 'Le nouveau mot de passe doit contenir au moins 8 caractères'),
+  })
+  .strict()
+  .refine((data) => data.currentPassword !== data.newPassword, {
+    message: "Le nouveau mot de passe doit être différent de l'ancien",
+    path: ['newPassword'],
+  });
+
 export const updateAppUserSchema = registerSchema.partial();

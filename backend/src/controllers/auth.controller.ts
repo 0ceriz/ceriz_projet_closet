@@ -17,6 +17,18 @@ const register: RequestHandler<
 > = async (req, res) => {
   const user = await authService.register(req.body);
 
+  // Générer un token pour le nouvel utilisateur
+  const token = await authService.login({
+    email: req.body.email,
+    password: req.body.password,
+  });
+
+  // Créer le cookie d'authentification
+  res.cookie('token', token, {
+    ...cookieOptions,
+    maxAge: 1000 * 60 * 60,
+  });
+
   res.status(201).json(user);
 };
 

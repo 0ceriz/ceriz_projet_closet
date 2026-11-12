@@ -4,6 +4,7 @@ import { authMiddleware } from '../../middlewares/auth.middlewares';
 import { appUserController } from '../../controllers/appUser.controller';
 import {
   appUserIdParamSchema,
+  changePasswordSchema,
   updateAppUserSchema,
 } from '../../schemas/appUser.schema';
 
@@ -19,6 +20,20 @@ appUserRoutes.get(
   validateParams(appUserIdParamSchema),
   appUserController.getById
 );
+
+appUserRoutes.patch(
+  '/me',
+  validateBody(updateAppUserSchema),
+  appUserController.updateMe
+);
+
+appUserRoutes.patch(
+  '/me/password',
+  validateBody(changePasswordSchema),
+  appUserController.changePassword
+);
+
+appUserRoutes.delete('/me', appUserController.deleteMe);
 
 appUserRoutes.patch(
   '/:id',

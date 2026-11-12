@@ -1,9 +1,12 @@
 import { z } from 'zod';
 import {
   appUserIdParamSchema,
+  changePasswordSchema,
   registerSchema,
   updateAppUserSchema,
 } from '../schemas/appUser.schema';
+
+export type ChangePasswordDTO = z.infer<typeof changePasswordSchema>;
 
 export type AppUserIdParams = z.infer<typeof appUserIdParamSchema>;
 export type AppUserId = AppUserIdParams['id'];

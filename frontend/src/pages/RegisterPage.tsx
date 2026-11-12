@@ -23,7 +23,9 @@ interface RegisterPageProps {
   onBackToLogin: () => void;
 }
 
-export default function RegisterPage({ onBackToLogin }: RegisterPageProps) {
+export default function RegisterPage({
+  onBackToLogin,
+}: RegisterPageProps) {
   const { register } = useAuth();
 
   const [pseudo, setPseudo] = useState("");
@@ -82,10 +84,12 @@ export default function RegisterPage({ onBackToLogin }: RegisterPageProps) {
       setEmail("");
       setPassword("");
       setPictureUrl("");
+
     } catch (error) {
       console.error("[REGISTER PAGE] Échec :", error);
 
       setError("Échec de la création du compte. Veuillez réessayer.");
+
     } finally {
       setLoading(false);
     }
@@ -138,11 +142,17 @@ export default function RegisterPage({ onBackToLogin }: RegisterPageProps) {
             </Alert>
           )}
 
-          {success && <Alert severity="success">{success}</Alert>}
+          {success && (
+            <Alert severity="success">
+              {success}
+            </Alert>
+          )}
 
           {/* Pseudo */}
           <Box>
-            <Typography sx={{ mb: 1 }}>Pseudo</Typography>
+            <Typography sx={{ mb: 1 }}>
+              Pseudo
+            </Typography>
 
             <TextField
               placeholder="Votre pseudo"
@@ -165,7 +175,9 @@ export default function RegisterPage({ onBackToLogin }: RegisterPageProps) {
 
           {/* Email */}
           <Box>
-            <Typography sx={{ mb: 1 }}>Email</Typography>
+            <Typography sx={{ mb: 1 }}>
+              Email
+            </Typography>
 
             <TextField
               placeholder="Votre adresse email"
@@ -188,7 +200,9 @@ export default function RegisterPage({ onBackToLogin }: RegisterPageProps) {
 
           {/* Password */}
           <Box>
-            <Typography sx={{ mb: 1 }}>Password</Typography>
+            <Typography sx={{ mb: 1 }}>
+              Password
+            </Typography>
 
             <TextField
               type={showPassword ? "text" : "password"}
@@ -222,7 +236,9 @@ export default function RegisterPage({ onBackToLogin }: RegisterPageProps) {
 
           {/* Picture URL */}
           <Box>
-            <Typography sx={{ mb: 1 }}>Picture URL (optionnel)</Typography>
+            <Typography sx={{ mb: 1 }}>
+              Picture URL (optionnel)
+            </Typography>
 
             <TextField
               placeholder="URL de votre photo"
@@ -262,7 +278,9 @@ export default function RegisterPage({ onBackToLogin }: RegisterPageProps) {
 
           {/* Retour Login */}
           <Box sx={{ textAlign: "center", mt: 1 }}>
-            <Typography component="span">Déjà un compte ?</Typography>
+            <Typography component="span">
+              Déjà un compte ?
+            </Typography>
 
             <Button
               type="button"
