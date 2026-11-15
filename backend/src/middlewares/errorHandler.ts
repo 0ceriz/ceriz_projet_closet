@@ -1,11 +1,11 @@
-import { Request, Response, ErrorRequestHandler, NextFunction } from 'express';
-import { AppError } from '../errors/AppError';
+import { Request, Response, ErrorRequestHandler, NextFunction } from "express";
+import { AppError } from "../errors/AppError";
 
 const errorHandler: ErrorRequestHandler = (
   err: Error,
   _req: Request,
   res: Response,
-  _next: NextFunction
+  _next: NextFunction,
 ) => {
   // 1 - Check if the error is an instance of AppError (Log error details and send public message)
   if (err instanceof AppError) {
@@ -18,7 +18,7 @@ const errorHandler: ErrorRequestHandler = (
   // 2 - For any other unhandled errors, log the details and return a generic 500 response
   console.error(`[UnhandledError 500] ${err.message} \nStack: ${err.stack}`);
   return res.status(500).json({
-    message: 'An unexpected error occurred.',
+    message: "An unexpected error occurred.",
   });
 };
 

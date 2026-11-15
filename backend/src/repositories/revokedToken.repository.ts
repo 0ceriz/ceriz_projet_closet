@@ -1,8 +1,8 @@
-import { pool } from '../db/db_connect';
-import { CreateRevokedTokenRepositoryData } from '../types/revokedToken.types';
+import { pool } from "../db/db_connect";
+import { CreateRevokedTokenRepositoryData } from "../types/revokedToken.types";
 
 const create = async (
-  data: CreateRevokedTokenRepositoryData
+  data: CreateRevokedTokenRepositoryData,
 ): Promise<void> => {
   const query = `
     INSERT INTO revoked_token (
@@ -27,17 +27,7 @@ const findByToken = async (token: string): Promise<boolean> => {
   return result.rowCount === 1;
 };
 
-const deleteExpired = async (): Promise<void> => {
-  const query = `
-    DELETE FROM revoked_token
-    WHERE expires_at < NOW();
-  `;
-
-  await pool.query(query);
-};
-
 export const revokedTokenRepository = {
   create,
   findByToken,
-  deleteExpired,
 };

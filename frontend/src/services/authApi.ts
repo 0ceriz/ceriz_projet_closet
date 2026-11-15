@@ -1,6 +1,5 @@
 import { api } from "../api/axios";
-import type { User } from "../types/auth.types";
-import type { CreateAppUserDTO } from "../types/auth.types";
+import type { User, CreateAppUserDTO } from "../types/auth.types";
 
 export interface LoginDTO {
   email: string;
@@ -38,7 +37,10 @@ export const authApi = {
 
   async me(): Promise<User> {
     const response = await api.get<User>("/auth/me");
-
     return response.data;
+  },
+
+  async forgotPassword(email: string): Promise<void> {
+    await api.post("/auth/forgot-password", { email });
   },
 };

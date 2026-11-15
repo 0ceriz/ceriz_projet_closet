@@ -1,41 +1,27 @@
-import eslint from '@eslint/js';
-import tseslint from 'typescript-eslint';
-import prettierPlugin from 'eslint-plugin-prettier';
-import { defineConfig } from "eslint/config";
+import js from "@eslint/js";
+import globals from "globals";
+import tseslint from "typescript-eslint";
+import { defineConfig, globalIgnores } from "eslint/config";
+import eslintConfigPrettier from "eslint-config-prettier";
 
-export default defineConfig(
-  eslint.configs.recommended,
-  tseslint.configs.recommendedTypeChecked,
-  tseslint.configs.stylisticTypeChecked,
+export default defineConfig([
+  globalIgnores(["dist"]),
   {
-    ignores: ['*.config.mjs', '*.config.js', 'node_modules', 'dist'],
-  },
-  {
+    files: ["**/*.ts"],
+    extends: [
+      js.configs.recommended,
+      tseslint.configs.recommended,
+      eslintConfigPrettier,
+    ],
     languageOptions: {
-      parserOptions: {
-        projectService: true,
-        tsconfigRootDir: import.meta.dirname,
-      },
-    },
-  },
-  {
-    plugins: {
-      prettier: prettierPlugin,
+      ecmaVersion: 2020,
+      globals: globals.node,
     },
     rules: {
-      'prettier/prettier': 'error', // Prévenir les conflits avec Prettier
-      '@typescript-eslint/no-floating-promises': 'error', // Interdit les promesses non gérées
-      '@typescript-eslint/no-unused-vars': [
-        'error',
-        { argsIgnorePattern: '^_' },
-      ], // Interdit les variables inutilisées sauf celles commençant par _
-      '@typescript-eslint/no-explicit-any': 'warn', // Interdit any
-      '@typescript-eslint/explicit-function-return-type': 'warn', // Encourage la déclaration explicite du type de retour des fonctions
-      // 'no-console': 'warn', // Interdit console.log
-      'no-var': 'error', // Interdit var
-      'prefer-const': 'error', // Encourage l'utilisation de const
-      'prefer-destructuring': 'error', // Encourage l'utilisation de la déstructuration
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        { argsIgnorePattern: "^_" },
+      ],
     },
-  }
-);
-
+  },
+]);

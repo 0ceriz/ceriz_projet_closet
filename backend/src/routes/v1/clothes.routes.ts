@@ -1,39 +1,43 @@
-import { Router } from 'express';
-import { clothesController } from '../../controllers/clothes.controller';
+import { Router } from "express";
+import { clothesController } from "../../controllers/clothes.controller";
 import {
   clothingIdParamSchema,
   createClothingItemSchema,
   updateClothingItemSchema,
-} from '../../schemas/clothes.schema';
-import { validateBody, validateParams } from '../../middlewares/validateSchema';
+} from "../../schemas/clothes.schema";
+import { validateBody, validateParams } from "../../middlewares/validateSchema";
+import { authMiddleware } from "../../middlewares/auth.middlewares";
 
 const clothesRoutes = Router();
 
-clothesRoutes.get('/', clothesController.getAll);
+// Toutes les routes nécessitent une authentification
+clothesRoutes.use(authMiddleware);
+
+clothesRoutes.get("/", clothesController.getAll);
 
 clothesRoutes.get(
-  '/:id',
+  "/:id",
   validateParams(clothingIdParamSchema),
-  clothesController.getById
+  clothesController.getById,
 );
 
 clothesRoutes.post(
-  '/',
+  "/",
   validateBody(createClothingItemSchema),
-  clothesController.create
+  clothesController.create,
 );
 
 clothesRoutes.put(
-  '/:id',
+  "/:id",
   validateParams(clothingIdParamSchema),
   validateBody(updateClothingItemSchema),
-  clothesController.updateById
+  clothesController.updateById,
 );
 
 clothesRoutes.delete(
-  '/:id',
+  "/:id",
   validateParams(clothingIdParamSchema),
-  clothesController.deleteById
+  clothesController.deleteById,
 );
 
 export default clothesRoutes;

@@ -1,12 +1,12 @@
-import { RequestHandler } from 'express';
-import { authService } from '../services/auth.service';
-import { CreateAppUserDTO, AppUserPublic } from '../types/appUser.types';
-import { LoginDTO } from '../types/auth.types';
+import { RequestHandler } from "express";
+import { authService } from "../services/auth.service";
+import { CreateAppUserDTO, AppUserPublic } from "../types/appUser.types";
+import { LoginDTO } from "../types/auth.types";
 
 const cookieOptions = {
   httpOnly: true,
   secure: false, // développement local
-  sameSite: 'lax' as const,
+  sameSite: "lax" as const,
 };
 
 const register: RequestHandler<
@@ -16,6 +16,18 @@ const register: RequestHandler<
   unknown
 > = async (req, res) => {
   const user = await authService.register(req.body);
+
+  // Générer un token pour le nouvel utilisateur
+  const token = await authService.login({
+    email: req.body.email,
+    password: req.body.password,
+  });
+
+  // Créer le cookie d'authentification
+  res.cookie("token", token, {
+    ...cookieOptions,
+    maxAge: 1000 * 60 * 60,
+  });
 
   res.status(201).json(user);
 };
@@ -28,13 +40,13 @@ const login: RequestHandler<
 > = async (req, res) => {
   const token = await authService.login(req.body);
 
-  res.cookie('token', token, {
+  res.cookie("token", token, {
     ...cookieOptions,
     maxAge: 1000 * 60 * 60,
   });
 
   res.status(200).json({
-    message: 'Login successful',
+    message: "Login successful",
   });
 };
 
@@ -44,7 +56,7 @@ const me: RequestHandler<unknown, AppUserPublic> = (req, res) => {
 
 const logout: RequestHandler<unknown, { message: string }> = async (
   req,
-  res
+  res,
 ) => {
   const { token } = req.cookies as { token?: string };
 
@@ -54,23 +66,34 @@ const logout: RequestHandler<unknown, { message: string }> = async (
     }
 
     res.status(200).json({
-      message: 'Logged out successfully',
+      message: "Logged out successfully",
     });
   } catch (error) {
-    console.error('[LOGOUT] Erreur:', error);
+    console.error("[LOGOUT] Erreur:", error);
 
     res.status(500).json({
-      message: 'Logout failed',
+      message: "Logout failed",
     });
   } finally {
     // Toujours essayer de supprimer le cookie
-    res.clearCookie('token', cookieOptions);
+    res.clearCookie("token", cookieOptions);
   }
+};
+
+const forgotPassword: RequestHandler<
+  unknown,
+  { message: string },
+  { email: string }
+> = (_req, res) => {
+  res.status(501).json({
+    message: "Password reset is not implemented yet",
+  });
 };
 
 export const authController = {
   register,
   login,
   me,
+  forgotPassword,
   logout,
 };

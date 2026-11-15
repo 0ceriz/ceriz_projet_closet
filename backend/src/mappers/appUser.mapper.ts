@@ -1,4 +1,4 @@
-import { AppUserDb, AppUserPublic } from '../types/appUser.types';
+import { AppUserDb, AppUserPublic } from "../types/appUser.types";
 
 export const mapAppUserDbToPublic = (user: AppUserDb): AppUserPublic => {
   return {

@@ -1,5 +1,10 @@
 import { createContext } from "react";
-import type { CreateAppUserDTO, User } from "../../types/auth.types";
+
+import type {
+  CreateAppUserDTO,
+  UpdateProfileDTO,
+  User,
+} from "../../types/auth.types";
 
 export interface AuthContextType {
   user: User | null;
@@ -9,6 +14,10 @@ export interface AuthContextType {
   register(data: CreateAppUserDTO): Promise<void>;
 
   logout(): Promise<void>;
+
+  updateProfile(data: UpdateProfileDTO): Promise<void>;
+
+  deleteAccount(): Promise<void>;
 
   loading: boolean;
 }

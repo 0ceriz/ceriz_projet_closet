@@ -1,11 +1,11 @@
-import { NotFoundError } from '../errors/AppError';
-import { clothesRepository } from '../repositories/clothes.repository';
+import { NotFoundError } from "../errors/AppError";
+import { clothesRepository } from "../repositories/clothes.repository";
 import {
   ClothingId,
   ClothingItem,
   CreateClothingItemDTO,
   UpdateClothingItemDTO,
-} from '../types/clothing.types';
+} from "../types/clothing.types";
 
 const getAll = async (): Promise<ClothingItem[]> => {
   const items = await clothesRepository.findAll();
@@ -14,7 +14,7 @@ const getAll = async (): Promise<ClothingItem[]> => {
 
 const getById = async (id: ClothingId): Promise<ClothingItem> => {
   const item = await clothesRepository.findById(id);
-  if (!item) throw new NotFoundError('Clothing item not found', id);
+  if (!item) throw new NotFoundError("Clothing item not found", id);
   return item;
 };
 
@@ -25,16 +25,16 @@ const create = async (data: CreateClothingItemDTO): Promise<ClothingItem> => {
 
 const updateById = async (
   id: ClothingId,
-  data: UpdateClothingItemDTO
+  data: UpdateClothingItemDTO,
 ): Promise<ClothingItem> => {
   const item = await clothesRepository.updateById(id, data);
-  if (!item) throw new NotFoundError('Clothing item not found', id);
+  if (!item) throw new NotFoundError("Clothing item not found", id);
   return item;
 };
 
 const deleteById = async (id: ClothingId): Promise<void> => {
   const deleted = await clothesRepository.deleteById(id);
-  if (!deleted) throw new NotFoundError('Clothing item not found', id);
+  if (!deleted) throw new NotFoundError("Clothing item not found", id);
   return void 0;
 };
 

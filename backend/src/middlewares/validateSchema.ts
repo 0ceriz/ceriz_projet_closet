@@ -1,20 +1,20 @@
-import { Request, Response, NextFunction } from 'express';
-import { z } from 'zod';
-import { ValidationError } from '../errors/AppError';
+import { Request, Response, NextFunction } from "express";
+import { z } from "zod";
+import { ValidationError } from "../errors/AppError";
 
 export const validateBody = (schema: z.ZodSchema) => {
   return (req: Request, _res: Response, next: NextFunction): void => {
-    console.log('[VALIDATION] req.body =', req.body);
+    console.log("[VALIDATION] req.body =", req.body);
     const result = schema.safeParse(req.body);
     if (!result.success) {
       console.error(
-        '[VALIDATION] Zod errors =',
-        result.success ? null : result.error.issues
+        "[VALIDATION] Zod errors =",
+        result.success ? null : result.error.issues,
       );
       return next(
         new ValidationError(
-          `Body validation failed: ${result.error.message.toString()}`
-        )
+          `Body validation failed: ${result.error.message.toString()}`,
+        ),
       );
     }
     req.body = result.data;
@@ -28,11 +28,11 @@ export const validateParams = (schema: z.ZodSchema) => {
     if (!result.success) {
       return next(
         new ValidationError(
-          `Params validation failed: ${result.error.message.toString()}`
-        )
+          `Params validation failed: ${result.error.message.toString()}`,
+        ),
       );
     }
-    req.params = result.data as Request['params'];
+    req.params = result.data as Request["params"];
     return next();
   };
 };

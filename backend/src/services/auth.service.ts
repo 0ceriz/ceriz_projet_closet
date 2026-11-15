@@ -1,16 +1,16 @@
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
-import { ConflictError, UnauthorizedError } from '../errors/AppError';
-import { appUserRepository } from '../repositories/appUser.repository';
+import { ConflictError, UnauthorizedError } from "../errors/AppError";
+import { appUserRepository } from "../repositories/appUser.repository";
 
-import { AppUserPublic, CreateAppUserDTO } from '../types/appUser.types';
-import { LoginDTO } from '../types/auth.types';
-import { mapAppUserDbToPublic } from '../mappers/appUser.mapper';
-import { revokedTokenRepository } from '../repositories/revokedToken.repository';
-import { hashPassword } from '../utils/hash';
-import { generateAccessToken } from '../utils/token';
-import { env } from '../config/env';
+import { AppUserPublic, CreateAppUserDTO } from "../types/appUser.types";
+import { LoginDTO } from "../types/auth.types";
+import { mapAppUserDbToPublic } from "../mappers/appUser.mapper";
+import { revokedTokenRepository } from "../repositories/revokedToken.repository";
+import { hashPassword } from "../utils/hash";
+import { generateAccessToken } from "../utils/token";
+import { env } from "../config/env";
 
 const register = async (data: CreateAppUserDTO): Promise<AppUserPublic> => {
   const existingUserByEmail = await appUserRepository.findByEmail(data.email);
@@ -20,7 +20,7 @@ const register = async (data: CreateAppUserDTO): Promise<AppUserPublic> => {
   }
 
   const existingUserByPseudo = await appUserRepository.findByPseudo(
-    data.pseudo
+    data.pseudo,
   );
 
   if (existingUserByPseudo) {
@@ -42,12 +42,12 @@ const register = async (data: CreateAppUserDTO): Promise<AppUserPublic> => {
     // This can happen if two concurrent requests try to register
     // the same email or pseudo at the same time.
     if (
-      typeof error === 'object' &&
+      typeof error === "object" &&
       error !== null &&
-      'code' in error &&
-      error.code === '23505'
+      "code" in error &&
+      error.code === "23505"
     ) {
-      throw new ConflictError('Email or pseudo already used');
+      throw new ConflictError("Email or pseudo already used");
     }
 
     throw error;
@@ -58,13 +58,13 @@ const login = async (data: LoginDTO): Promise<string> => {
   const user = await appUserRepository.findByEmail(data.email);
 
   if (!user) {
-    throw new UnauthorizedError('Invalid email or password');
+    throw new UnauthorizedError("Invalid email or password");
   }
 
   const isMatch = await bcrypt.compare(data.password, user.password_hash);
 
   if (!isMatch) {
-    throw new UnauthorizedError('Invalid email or password');
+    throw new UnauthorizedError("Invalid email or password");
   }
 
   const token = generateAccessToken({
@@ -78,13 +78,13 @@ const login = async (data: LoginDTO): Promise<string> => {
 const logout = async (token: string): Promise<void> => {
   const decoded = jwt.verify(
     token,
-    env.JWT_ACCESS_TOKEN_SECRET
+    env.JWT_ACCESS_TOKEN_SECRET,
   ) as jwt.JwtPayload;
 
-  console.log('Decoded token:', decoded);
+  console.log("Decoded token:", decoded);
 
-  if (typeof decoded.exp !== 'number') {
-    throw new Error('Token does not contain an expiration date');
+  if (typeof decoded.exp !== "number") {
+    throw new Error("Token does not contain an expiration date");
   }
 
   const expiresAt = new Date(decoded.exp * 1000);

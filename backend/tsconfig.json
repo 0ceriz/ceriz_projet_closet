@@ -45,6 +45,11 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["src/**/*.ts", "tests/**/*.ts", "jest.config.ts",  "types/**/*.ts"],
+  "include": [
+    "src/**/*.ts",
+    "tests/**/*.ts",
+    "jest.config.ts",
+    "types/**/*.ts"
+  ],
   "exclude": ["node_modules", "dist"]
 }

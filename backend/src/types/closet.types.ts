@@ -1,13 +1,13 @@
-import { z } from 'zod';
+import { z } from "zod";
 import {
   closetIdParamSchema,
   createClosetSchema,
   updateClosetSchema,
-} from '../schemas/closet.schema';
-import { AppUserId } from './appUser.types';
+} from "../schemas/closet.schema";
+import { AppUserId } from "./appUser.types";
 
 export type ClosetIdParams = z.infer<typeof closetIdParamSchema>;
-export type ClosetId = ClosetIdParams['id'];
+export type ClosetId = ClosetIdParams["id"];
 
 // CreateClosetDTO and UpdateClosetDTO represent the expected shape of the data when creating or updating a closet, respectively.
 export type CreateClosetDTO = z.infer<typeof createClosetSchema>;

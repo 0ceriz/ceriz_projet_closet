@@ -1,7 +1,13 @@
+import { Button } from "@mui/material";
+
 import { useAuth } from "../../hooks/useAuth";
 import LogoutButton from "./LogoutButton";
 
-export default function Header() {
+interface HeaderProps {
+  onProfile: () => void;
+}
+
+export default function Header({ onProfile }: HeaderProps) {
   const { user } = useAuth();
 
   return (
@@ -11,7 +17,9 @@ export default function Header() {
       <div>
         <span>{user?.pseudo}</span>
 
-        <button type="button">Profile</button>
+        <Button onClick={onProfile} color="inherit">
+          Profile
+        </Button>
 
         <LogoutButton />
       </div>
