@@ -1,18 +1,18 @@
-import { RequestHandler } from 'express';
+import { RequestHandler } from "express";
 import {
   ClosetIdParams,
   Closet,
   CreateClosetDTO,
   UpdateClosetDTO,
-} from '../types/closet.types';
-import { closetService } from '../services/closet.service';
-import { UnauthorizedError } from '../errors/AppError';
+} from "../types/closet.types";
+import { closetService } from "../services/closet.service";
+import { UnauthorizedError } from "../errors/AppError";
 
 const getAll: RequestHandler<unknown, Closet[], unknown, unknown> = async (
   _req,
-  res
+  res,
 ) => {
-  console.log('[GET] /api/v1/closets');
+  console.log("[GET] /api/v1/closets");
   const closets = await closetService.getAll();
   res.status(200).json(closets);
 };
@@ -35,10 +35,10 @@ const create: RequestHandler<
   CreateClosetDTO,
   unknown
 > = async (req, res) => {
-  console.log('[POST] /api/v1/closets');
+  console.log("[POST] /api/v1/closets");
 
   if (!req.user) {
-    throw new UnauthorizedError('User not authenticated');
+    throw new UnauthorizedError("User not authenticated");
   }
 
   const createdCloset = await closetService.create(req.body, req.user.id);
@@ -57,13 +57,13 @@ const updateById: RequestHandler<
   console.log(`[PATCH] /api/v1/closets/${id}`);
 
   if (!req.user) {
-    throw new UnauthorizedError('User not authenticated');
+    throw new UnauthorizedError("User not authenticated");
   }
 
   const updatedCloset = await closetService.updateById(
     id,
     req.body,
-    req.user.id
+    req.user.id,
   );
 
   res.status(200).json(updatedCloset);
@@ -78,7 +78,7 @@ const deleteById: RequestHandler<
   const { id } = req.params;
   console.log(`[DELETE] /api/v1/closets/${id}`);
   if (!req.user) {
-    throw new UnauthorizedError('User not authenticated');
+    throw new UnauthorizedError("User not authenticated");
   }
 
   await closetService.deleteById(id, req.user.id);
@@ -87,10 +87,10 @@ const deleteById: RequestHandler<
 };
 
 const getMyClosets: RequestHandler = async (req, res) => {
-  console.log('[GET] /closets/me');
+  console.log("[GET] /closets/me");
 
   if (!req.user) {
-    throw new UnauthorizedError('User not authenticated');
+    throw new UnauthorizedError("User not authenticated");
   }
 
   const closets = await closetService.getByUserId(req.user.id);

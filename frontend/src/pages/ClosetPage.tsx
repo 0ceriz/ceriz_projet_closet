@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import Title from "../component/Title";
 import CreateClosetForm from "../component/CreateClosetForm";
@@ -16,22 +16,30 @@ interface ClosetPageProps {
 export default function ClosetPage({ onProfile }: ClosetPageProps) {
   const [closets, setClosets] = useState<Closet[]>([]);
   const [loadingClosets, setLoadingClosets] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedCloset, setSelectedCloset] = useState<Closet | null>(null);
 
-  const loadClosets = async () => {
+  const loadClosets = useCallback(async () => {
+    setLoadingClosets(true);
+    setError(null);
+
     try {
       const data = await closetApi.getMyClosets();
       setClosets(data);
     } catch (error) {
-      console.error("Erreur chargement closets", error);
+      console.error("Erreur chargement closets :", error);
+
+      setError(
+        "Impossible de charger vos placards. Vérifiez votre connexion et réessayez.",
+      );
     } finally {
       setLoadingClosets(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     void loadClosets();
-  }, []);
+  }, [loadClosets]);
 
   return (
     <>
@@ -49,6 +57,13 @@ export default function ClosetPage({ onProfile }: ClosetPageProps) {
 
       {loadingClosets ? (
         <p>Loading closets...</p>
+      ) : error ? (
+        <div role="alert">
+          <p>{error}</p>
+          <button type="button" onClick={() => void loadClosets()}>
+            Retry
+          </button>
+        </div>
       ) : closets.length === 0 ? (
         <p>No closet yet</p>
       ) : (

@@ -2,9 +2,9 @@ import {
   ConflictError,
   ForbiddenError,
   NotFoundError,
-} from '../errors/AppError';
-import { closetRepository } from '../repositories/closet.repository';
-import { AppUserId } from '../types/appUser.types';
+} from "../errors/AppError";
+import { closetRepository } from "../repositories/closet.repository";
+import { AppUserId } from "../types/appUser.types";
 import {
   Closet,
   ClosetId,
@@ -12,7 +12,7 @@ import {
   CreateClosetRepositoryData,
   UpdateClosetDTO,
   UpdateClosetRepositoryData,
-} from '../types/closet.types';
+} from "../types/closet.types";
 
 const getAll = async (): Promise<Closet[]> => {
   const closets = await closetRepository.findAll();
@@ -29,12 +29,12 @@ const getById = async (id: ClosetId): Promise<Closet> => {
 
 const create = async (
   data: CreateClosetDTO,
-  authenticatedUserId: AppUserId
+  authenticatedUserId: AppUserId,
 ): Promise<Closet> => {
   // Check if the closet name is already used for this user
   const existingClosetByName = await closetRepository.findByNameAndUserId(
     data.name,
-    authenticatedUserId
+    authenticatedUserId,
   );
 
   if (existingClosetByName) {
@@ -57,13 +57,13 @@ const create = async (
     return createdCloset;
   } catch (error: unknown) {
     if (
-      typeof error === 'object' &&
+      typeof error === "object" &&
       error !== null &&
-      'code' in error &&
-      error.code === '23505'
+      "code" in error &&
+      error.code === "23505"
     ) {
       throw new ConflictError(
-        `You already have a closet named "${data.name}".`
+        `You already have a closet named "${data.name}".`,
       );
     }
 
@@ -74,18 +74,18 @@ const create = async (
 const updateById = async (
   id: ClosetId,
   data: UpdateClosetDTO,
-  authenticatedUserId: AppUserId
+  authenticatedUserId: AppUserId,
 ): Promise<Closet> => {
   // 1. Check if closet exists
   const existingCloset = await closetRepository.findById(id);
 
   if (!existingCloset) {
-    throw new NotFoundError('closet', id);
+    throw new NotFoundError("closet", id);
   }
 
   // 2. Check ownership (IMPORTANT pour le TODO auth)
   if (existingCloset.userId !== authenticatedUserId) {
-    throw new ForbiddenError('You are not allowed to update this closet');
+    throw new ForbiddenError("You are not allowed to update this closet");
   }
 
   // 3. Build update payload
@@ -103,7 +103,7 @@ const updateById = async (
   const updatedCloset = await closetRepository.updateById(id, updatePayload);
 
   if (!updatedCloset) {
-    throw new NotFoundError('closet', id);
+    throw new NotFoundError("closet", id);
   }
 
   return updatedCloset;
@@ -111,25 +111,25 @@ const updateById = async (
 
 const deleteById = async (
   id: ClosetId,
-  authenticatedUserId: AppUserId
+  authenticatedUserId: AppUserId,
 ): Promise<void> => {
   // Check if the closet exists
   const existingCloset = await closetRepository.findById(id);
 
   if (!existingCloset) {
-    throw new NotFoundError('closet', id);
+    throw new NotFoundError("closet", id);
   }
 
   // Check ownership
   if (existingCloset.userId !== authenticatedUserId) {
-    throw new ForbiddenError('You are not allowed to delete this closet');
+    throw new ForbiddenError("You are not allowed to delete this closet");
   }
 
   // Delete the closet
   const hasDeletedCloset = await closetRepository.deleteById(id);
 
   if (!hasDeletedCloset) {
-    throw new NotFoundError('closet', id);
+    throw new NotFoundError("closet", id);
   }
 };
 

@@ -1,8 +1,8 @@
-import { env } from '../config/env';
-import jwt from 'jsonwebtoken';
-import { JwtPayload_spe as JwtPayload_perso } from '../types/auth.types';
+import { env } from "../config/env";
+import jwt from "jsonwebtoken";
+import { JwtPayload_spe as JwtPayload_perso } from "../types/auth.types";
 
-const ACCESS_TOKEN_EXPIRATION = '1h'; // 1 hour as the cookie is set to expire in 1 hour, so the access token should also expire in 1 hour
+const ACCESS_TOKEN_EXPIRATION = "1h"; // 1 hour as the cookie is set to expire in 1 hour, so the access token should also expire in 1 hour
 
 export function generateAccessToken(payload: JwtPayload_perso): string {
   return jwt.sign(payload, env.JWT_ACCESS_TOKEN_SECRET, {

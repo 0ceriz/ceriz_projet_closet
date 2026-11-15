@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 
 import { useAuth } from "./hooks/useAuth";
@@ -8,16 +9,18 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ClosetPage from "./pages/ClosetPage";
 import ProfilePage from "./pages/ProfilePage";
 
-type Page = "login" | "register" | "forgotPassword" | "profile";
+import { authApi } from "./services/authApi";
 
-const handleForgotPassword = async (email: string) => {
-  console.log("Email renseigné :", email);
-};
+type Page = "login" | "register" | "forgotPassword" | "profile";
 
 function App() {
   const { user, loading } = useAuth();
 
   const [currentPage, setCurrentPage] = useState<Page>("login");
+
+  const handleForgotPassword = async (email: string) => {
+    await authApi.forgotPassword(email);
+  };
 
   if (loading) {
     return <p>Loading...</p>;
@@ -34,7 +37,11 @@ function App() {
         );
 
       case "register":
-        return <RegisterPage onBackToLogin={() => setCurrentPage("login")} />;
+        return (
+          <RegisterPage
+            onBackToLogin={() => setCurrentPage("login")}
+          />
+        );
 
       case "forgotPassword":
         return (
@@ -43,14 +50,30 @@ function App() {
             onSubmitEmail={handleForgotPassword}
           />
         );
+
+      default:
+        return (
+          <LoginPage
+            onRegister={() => setCurrentPage("register")}
+            onForgotPassword={() => setCurrentPage("forgotPassword")}
+          />
+        );
     }
   }
 
   if (currentPage === "profile") {
-    return <ProfilePage onBack={() => setCurrentPage("login")} />;
+    return (
+      <ProfilePage
+        onBack={() => setCurrentPage("login")}
+      />
+    );
   }
 
-  return <ClosetPage onProfile={() => setCurrentPage("profile")} />;
+  return (
+    <ClosetPage
+      onProfile={() => setCurrentPage("profile")}
+    />
+  );
 }
 
 export default App;

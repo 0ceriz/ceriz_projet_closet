@@ -1,5 +1,5 @@
-import { Pool } from 'pg';
-import { env } from '../config/env';
+import { Pool } from "pg";
+import { env } from "../config/env";
 
 export const pool = new Pool({
   user: env.POSTGRES_USER,
@@ -12,15 +12,15 @@ export const pool = new Pool({
   connectionTimeoutMillis: 5000,
 });
 
-pool.on('error', (err) => {
-  console.error('❌ Unexpected error on idle PostgreSQL client:', err);
+pool.on("error", (err) => {
+  console.error("❌ Unexpected error on idle PostgreSQL client:", err);
 });
 
 export async function closePool(): Promise<void> {
   try {
     await pool.end();
-    console.log('✅ PostgreSQL connection pool closed');
+    console.log("✅ PostgreSQL connection pool closed");
   } catch (err) {
-    console.error('❌ Error closing PostgreSQL connection pool:', err);
+    console.error("❌ Error closing PostgreSQL connection pool:", err);
   }
 }

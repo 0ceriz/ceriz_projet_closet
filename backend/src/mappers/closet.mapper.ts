@@ -1,6 +1,6 @@
-import { Closet } from '../types/closet.types';
+import { Closet } from "../types/closet.types";
 
-interface ClosetDb {
+export interface ClosetDb {
   id: string;
   user_id: string;
   name: string;

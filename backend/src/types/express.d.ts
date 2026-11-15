@@ -1,5 +1,5 @@
-import 'express';
-import { AppUserPublic } from './appUser.types';
+import "express";
+import { AppUserPublic } from "./appUser.types";
 
 declare global {
   namespace Express {

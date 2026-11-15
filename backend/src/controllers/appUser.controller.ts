@@ -1,4 +1,4 @@
-import type { RequestHandler } from 'express';
+import type { RequestHandler } from "express";
 
 import {
   AppUserIdParams,
@@ -6,10 +6,10 @@ import {
   ChangePasswordDTO,
   CreateAppUserDTO,
   UpdateAppUserDTO,
-} from '../types/appUser.types';
+} from "../types/appUser.types";
 
-import { appUserService } from '../services/appUser.service';
-import { UnauthorizedError } from '../errors/AppError';
+import { appUserService } from "../services/appUser.service";
+import { UnauthorizedError } from "../errors/AppError";
 
 const getAll: RequestHandler<
   unknown,
@@ -17,7 +17,7 @@ const getAll: RequestHandler<
   unknown,
   unknown
 > = async (_req, res) => {
-  console.log('[GET] /api/v1/users');
+  console.log("[GET] /api/v1/users");
 
   const users = await appUserService.getAll();
 
@@ -45,7 +45,7 @@ const create: RequestHandler<
   CreateAppUserDTO,
   unknown
 > = async (req, res) => {
-  console.log('[POST] /api/v1/users');
+  console.log("[POST] /api/v1/users");
 
   const createdUser = await appUserService.create(req.body);
 
@@ -63,13 +63,13 @@ const updateById: RequestHandler<
   console.log(`[PATCH] /api/v1/users/${id}`);
 
   if (!req.user) {
-    throw new UnauthorizedError('User not authenticated');
+    throw new UnauthorizedError("User not authenticated");
   }
 
   const updatedUser = await appUserService.updateById(
     id,
     req.body,
-    req.user.id
+    req.user.id,
   );
 
   res.status(200).json(updatedUser);
@@ -86,7 +86,7 @@ const deleteById: RequestHandler<
   console.log(`[DELETE] /api/v1/users/${id}`);
 
   if (!req.user) {
-    throw new UnauthorizedError('User not authenticated');
+    throw new UnauthorizedError("User not authenticated");
   }
 
   await appUserService.deleteById(id, req.user.id);
@@ -101,15 +101,15 @@ const updateMe: RequestHandler<
   unknown
 > = async (req, res) => {
   if (!req.user) {
-    throw new UnauthorizedError('User not authenticated');
+    throw new UnauthorizedError("User not authenticated");
   }
 
-  console.log('[PATCH] /api/v1/users/me');
+  console.log("[PATCH] /api/v1/users/me");
 
   const updatedUser = await appUserService.updateById(
     req.user.id,
     req.body,
-    req.user.id
+    req.user.id,
   );
 
   res.status(200).json(updatedUser);
@@ -122,17 +122,17 @@ const changePassword: RequestHandler<
   unknown
 > = async (req, res) => {
   if (!req.user) {
-    throw new UnauthorizedError('User not authenticated');
+    throw new UnauthorizedError("User not authenticated");
   }
 
-  console.log('[PATCH] /api/v1/users/me/password');
+  console.log("[PATCH] /api/v1/users/me/password");
 
   const { currentPassword, newPassword } = req.body;
 
   await appUserService.changePassword(
     req.user.id,
     currentPassword,
-    newPassword
+    newPassword,
   );
 
   res.status(204).end();
@@ -141,21 +141,21 @@ const changePassword: RequestHandler<
 // Supprimer le compte de l'utilisateur connecté
 const deleteMe: RequestHandler<unknown, void, unknown, unknown> = async (
   req,
-  res
+  res,
 ) => {
   if (!req.user) {
-    throw new UnauthorizedError('User not authenticated');
+    throw new UnauthorizedError("User not authenticated");
   }
 
-  console.log('[DELETE] /api/v1/users/me');
+  console.log("[DELETE] /api/v1/users/me");
 
   await appUserService.deleteById(req.user.id, req.user.id);
 
   // Suppression du cookie d'authentification
-  res.clearCookie('token', {
+  res.clearCookie("token", {
     httpOnly: true,
     secure: false,
-    sameSite: 'lax',
+    sameSite: "lax",
   });
 
   res.status(204).end();

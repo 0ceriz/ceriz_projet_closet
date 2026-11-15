@@ -1,11 +1,11 @@
-import { RequestHandler } from 'express';
+import { RequestHandler } from "express";
 import {
   ClothingIdParams,
   ClothingItem,
   CreateClothingItemDTO,
   UpdateClothingItemDTO,
-} from '../types/clothing.types';
-import { clothesService } from '../services/clothes.service';
+} from "../types/clothing.types";
+import { clothesService } from "../services/clothes.service";
 
 const getAll: RequestHandler<
   unknown,
@@ -13,7 +13,7 @@ const getAll: RequestHandler<
   unknown,
   unknown
 > = async (_req, res) => {
-  console.log('[GET] /api/v1/clothes');
+  console.log("[GET] /api/v1/clothes");
   const items = await clothesService.getAll();
   res.status(200).json(items);
 };
@@ -36,7 +36,7 @@ const create: RequestHandler<
   CreateClothingItemDTO,
   unknown
 > = async (req, res) => {
-  console.log('[POST] /api/v1/clothes');
+  console.log("[POST] /api/v1/clothes");
   const newItem: CreateClothingItemDTO = req.body;
   const createdItem: ClothingItem = await clothesService.create(newItem);
   res.status(201).json(createdItem);

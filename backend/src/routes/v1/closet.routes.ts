@@ -1,44 +1,44 @@
-import { Router } from 'express';
-import { validateBody, validateParams } from '../../middlewares/validateSchema';
-import { closetController } from '../../controllers/closet.controller';
-import { authMiddleware } from '../../middlewares/auth.middlewares';
+import { Router } from "express";
+import { validateBody, validateParams } from "../../middlewares/validateSchema";
+import { closetController } from "../../controllers/closet.controller";
+import { authMiddleware } from "../../middlewares/auth.middlewares";
 import {
   closetIdParamSchema,
   createClosetSchema,
   updateClosetSchema,
-} from '../../schemas/closet.schema';
+} from "../../schemas/closet.schema";
 
 const closetRoutes = Router();
 
 closetRoutes.use(authMiddleware);
 
-closetRoutes.get('/me', closetController.getMyClosets);
+closetRoutes.get("/me", closetController.getMyClosets);
 
-closetRoutes.get('/', closetController.getAll);
+closetRoutes.get("/", closetController.getAll);
 
 closetRoutes.get(
-  '/:id',
+  "/:id",
   validateParams(closetIdParamSchema),
-  closetController.getById
+  closetController.getById,
 );
 
 closetRoutes.post(
-  '/',
+  "/",
   validateBody(createClosetSchema),
-  closetController.create
+  closetController.create,
 );
 
 closetRoutes.patch(
-  '/:id',
+  "/:id",
   validateParams(closetIdParamSchema),
   validateBody(updateClosetSchema),
-  closetController.updateById
+  closetController.updateById,
 );
 
 closetRoutes.delete(
-  '/:id',
+  "/:id",
   validateParams(closetIdParamSchema),
-  closetController.deleteById
+  closetController.deleteById,
 );
 
 export default closetRoutes;

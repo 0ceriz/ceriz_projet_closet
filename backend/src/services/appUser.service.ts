@@ -1,13 +1,13 @@
-import bcrypt from 'bcrypt';
+import bcrypt from "bcrypt";
 
 import {
   ConflictError,
   NotFoundError,
   UnauthorizedError,
   ForbiddenError,
-} from '../errors/AppError';
+} from "../errors/AppError";
 
-import { appUserRepository } from '../repositories/appUser.repository';
+import { appUserRepository } from "../repositories/appUser.repository";
 
 import {
   AppUserId,
@@ -15,10 +15,10 @@ import {
   CreateAppUserDTO,
   UpdateAppUserDTO,
   UpdateAppUserRepositoryData,
-} from '../types/appUser.types';
+} from "../types/appUser.types";
 
-import { mapAppUserDbToPublic } from '../mappers/appUser.mapper';
-import { hashPassword } from '../utils/hash';
+import { mapAppUserDbToPublic } from "../mappers/appUser.mapper";
+import { hashPassword } from "../utils/hash";
 
 const getAll = async (): Promise<AppUserPublic[]> => {
   const users = await appUserRepository.findAll();
@@ -30,7 +30,7 @@ const getById = async (id: AppUserId): Promise<AppUserPublic> => {
   const user = await appUserRepository.findById(id);
 
   if (!user) {
-    throw new NotFoundError('app_user', id);
+    throw new NotFoundError("app_user", id);
   }
 
   return mapAppUserDbToPublic(user);
@@ -46,7 +46,7 @@ const create = async (data: CreateAppUserDTO): Promise<AppUserPublic> => {
 
   // Vérifier si le pseudo existe déjà
   const existingUserByPseudo = await appUserRepository.findByPseudo(
-    data.pseudo
+    data.pseudo,
   );
 
   if (existingUserByPseudo) {
@@ -70,17 +70,17 @@ const create = async (data: CreateAppUserDTO): Promise<AppUserPublic> => {
 const updateById = async (
   id: AppUserId,
   data: UpdateAppUserDTO,
-  authenticatedUserId: AppUserId
+  authenticatedUserId: AppUserId,
 ): Promise<AppUserPublic> => {
   const existingUser = await appUserRepository.findById(id);
 
   if (!existingUser) {
-    throw new NotFoundError('app_user', id);
+    throw new NotFoundError("app_user", id);
   }
 
   // Vérifier que l'utilisateur modifie son propre compte
   if (id !== authenticatedUserId) {
-    throw new ForbiddenError('You are not allowed to update this user');
+    throw new ForbiddenError("You are not allowed to update this user");
   }
 
   // Vérifier l'unicité de l'adresse email
@@ -95,7 +95,7 @@ const updateById = async (
   // Vérifier l'unicité du pseudo
   if (data.pseudo && data.pseudo !== existingUser.pseudo) {
     const existingUserByPseudo = await appUserRepository.findByPseudo(
-      data.pseudo
+      data.pseudo,
     );
 
     if (existingUserByPseudo && existingUserByPseudo.id !== id) {
@@ -125,18 +125,18 @@ const updateById = async (
     const updatedUser = await appUserRepository.updateById(id, updatePayload);
 
     if (!updatedUser) {
-      throw new NotFoundError('app_user', id);
+      throw new NotFoundError("app_user", id);
     }
 
     return mapAppUserDbToPublic(updatedUser);
   } catch (error: unknown) {
     if (
-      typeof error === 'object' &&
+      typeof error === "object" &&
       error !== null &&
-      'code' in error &&
-      error.code === '23505'
+      "code" in error &&
+      error.code === "23505"
     ) {
-      throw new ConflictError('Email or pseudo already used');
+      throw new ConflictError("Email or pseudo already used");
     }
 
     throw error;
@@ -146,25 +146,25 @@ const updateById = async (
 // Supprimer un compte utilisateur
 const deleteById = async (
   id: AppUserId,
-  authenticatedUserId: AppUserId
+  authenticatedUserId: AppUserId,
 ): Promise<void> => {
   // Vérifier que l'utilisateur supprime uniquement son propre compte
   if (id !== authenticatedUserId) {
-    throw new ForbiddenError('You are not allowed to delete this user');
+    throw new ForbiddenError("You are not allowed to delete this user");
   }
 
   // Vérifier que le compte existe
   const existingUser = await appUserRepository.findById(id);
 
   if (!existingUser) {
-    throw new NotFoundError('app_user', id);
+    throw new NotFoundError("app_user", id);
   }
 
   // Supprimer le compte
   const deleted = await appUserRepository.deleteById(id);
 
   if (!deleted) {
-    throw new NotFoundError('app_user', id);
+    throw new NotFoundError("app_user", id);
   }
 };
 
@@ -172,21 +172,21 @@ const deleteById = async (
 const changePassword = async (
   userId: AppUserId,
   currentPassword: string,
-  newPassword: string
+  newPassword: string,
 ): Promise<void> => {
   const user = await appUserRepository.findById(userId);
 
   if (!user) {
-    throw new NotFoundError('User not found');
+    throw new NotFoundError("User not found");
   }
 
   const isPasswordValid = await bcrypt.compare(
     currentPassword,
-    user.password_hash
+    user.password_hash,
   );
 
   if (!isPasswordValid) {
-    throw new UnauthorizedError('Current password is incorrect');
+    throw new UnauthorizedError("Current password is incorrect");
   }
 
   const passwordHash = await hashPassword(newPassword);

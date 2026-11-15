@@ -1,11 +1,11 @@
-import { pool } from '../db/db_connect';
+import { pool } from "../db/db_connect";
 
 import {
   AppUserDb,
   AppUserId,
   CreateAppUserRepositoryData,
   UpdateAppUserRepositoryData,
-} from '../types/appUser.types';
+} from "../types/appUser.types";
 
 const findAll = async (): Promise<AppUserDb[]> => {
   const query = `
@@ -84,7 +84,7 @@ const findByPseudo = async (pseudo: string): Promise<AppUserDb | null> => {
 };
 
 const create = async (
-  data: CreateAppUserRepositoryData
+  data: CreateAppUserRepositoryData,
 ): Promise<AppUserDb> => {
   const query = `
     INSERT INTO app_user (
@@ -118,7 +118,7 @@ const create = async (
 
 const updateById = async (
   id: AppUserId,
-  data: UpdateAppUserRepositoryData
+  data: UpdateAppUserRepositoryData,
 ): Promise<AppUserDb | null> => {
   const fieldsToUpdate: string[] = [];
   const values: unknown[] = [];
@@ -152,13 +152,13 @@ const updateById = async (
     return findById(id);
   }
 
-  fieldsToUpdate.push('updated_at = NOW()');
+  fieldsToUpdate.push("updated_at = NOW()");
 
   values.push(id);
 
   const query = `
     UPDATE app_user
-    SET ${fieldsToUpdate.join(', ')}
+    SET ${fieldsToUpdate.join(", ")}
     WHERE id = $${paramIndex}
     RETURNING
       id,

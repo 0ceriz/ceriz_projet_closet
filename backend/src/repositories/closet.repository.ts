@@ -1,10 +1,12 @@
-import { pool } from '../db/db_connect';
+import { pool } from "../db/db_connect";
 import {
   Closet,
   ClosetId,
   CreateClosetRepositoryData,
   UpdateClosetRepositoryData,
-} from '../types/closet.types';
+} from "../types/closet.types";
+import { mapClosetDbToCloset } from "../mappers/closet.mapper";
+import type { ClosetDb } from "../mappers/closet.mapper";
 
 const findAll = async (): Promise<Closet[]> => {
   const query = `
@@ -19,8 +21,8 @@ const findAll = async (): Promise<Closet[]> => {
     ORDER BY created_at DESC;
   `;
 
-  const result = await pool.query<Closet>(query);
-  return result.rows;
+  const result = await pool.query<ClosetDb>(query);
+  return result.rows.map((row: ClosetDb) => mapClosetDbToCloset(row));
 };
 
 const findById = async (id: ClosetId): Promise<Closet | null> => {
@@ -36,13 +38,14 @@ const findById = async (id: ClosetId): Promise<Closet | null> => {
     WHERE id = $1;
   `;
 
-  const result = await pool.query<Closet>(query, [id]);
-  return result.rows[0] ?? null;
+  const result = await pool.query<ClosetDb>(query, [id]);
+  const closet = result.rows[0];
+  return closet ? mapClosetDbToCloset(closet) : null;
 };
 
 const findByNameAndUserId = async (
   name: string,
-  userId: string
+  userId: string,
 ): Promise<Closet | null> => {
   const query = `
     SELECT
@@ -57,9 +60,9 @@ const findByNameAndUserId = async (
       AND user_id = $2;
   `;
 
-  const result = await pool.query<Closet>(query, [name, userId]);
-
-  return result.rows[0] ?? null;
+  const result = await pool.query<ClosetDb>(query, [name, userId]);
+  const closet = result.rows[0];
+  return closet ? mapClosetDbToCloset(closet) : null;
 };
 
 const create = async (data: CreateClosetRepositoryData): Promise<Closet> => {
@@ -81,9 +84,14 @@ const create = async (data: CreateClosetRepositoryData): Promise<Closet> => {
 
   const values = [data.user_id, data.name, data.description ?? null];
 
-  const result = await pool.query<Closet>(query, values);
+  const result = await pool.query<ClosetDb>(query, values);
+  const closet = result.rows[0];
 
-  return result.rows[0]!;
+  if (!closet) {
+    throw new Error("The database did not return the created closet");
+  }
+
+  return mapClosetDbToCloset(closet);
 };
 
 const deleteById = async (id: ClosetId): Promise<boolean> => {
@@ -111,13 +119,13 @@ const findByUserId = async (userId: string): Promise<Closet[]> => {
     ORDER BY created_at DESC;
   `;
 
-  const result = await pool.query<Closet>(query, [userId]);
-  return result.rows;
+  const result = await pool.query<ClosetDb>(query, [userId]);
+  return result.rows.map((row: ClosetDb) => mapClosetDbToCloset(row));
 };
 
 const updateById = async (
   id: ClosetId,
-  data: UpdateClosetRepositoryData
+  data: UpdateClosetRepositoryData,
 ): Promise<Closet | null> => {
   //COALESCE permet de garder la valeur actuelle si la nouvelle valeur est null
   const query = `
@@ -138,9 +146,9 @@ const updateById = async (
 
   const values = [id, data.name ?? null, data.description ?? null];
 
-  const result = await pool.query<Closet>(query, values);
-
-  return result.rows[0] ?? null;
+  const result = await pool.query<ClosetDb>(query, values);
+  const closet = result.rows[0];
+  return closet ? mapClosetDbToCloset(closet) : null;
 };
 
 export const closetRepository = {
